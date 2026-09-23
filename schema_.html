@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+window.MathJax = {
+  tex: {inlineMath: [['\\(','\\)'], ['$', '$']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<title>물리화학도우미</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:#f4f6fb;color:#182033}
+.wrap{max-width:760px;margin:auto;padding:18px}
+h1{font-size:26px;margin:8px 0}.sub{color:#687086;margin-bottom:16px}
+.panel{background:white;border-radius:18px;padding:16px;box-shadow:0 5px 20px #0000000d;margin-bottom:14px}
+select,button{font:inherit;border:0;border-radius:12px;padding:12px 14px;cursor:pointer}
+select{width:100%;background:#eef1f7}.tabs{display:flex;gap:8px;overflow-x:auto;margin:12px 0;padding-bottom:4px}.tabs button{white-space:nowrap;background:#eef1f7;flex:1}.tabs button.on{background:#182033;color:white}
+.card{min-height:270px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;border:2px solid #e6e9f0;border-radius:18px;padding:28px;position:relative}
+.badge{position:absolute;top:14px;left:14px;font-size:13px;color:#667085}.q{font-size:22px;font-weight:750;line-height:1.5}.a{font-size:25px;font-weight:800;line-height:1.5;color:#1d2939}
+.unit-tag{color:#3b82f6;font-weight:800;margin-right:6px}
+.hint{color:#7b8498;font-size:13px;margin-top:10px;text-align:center}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.actions button{font-weight:700}.wrong{background:#ffe7e7}.right{background:#e3f7eb}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}.score{font-weight:750}
+.small{font-size:13px;color:#70798d}
+.symbol-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:8px;margin-top:10px}
+@media(max-width:500px){.q{font-size:18px}.a{font-size:21px}.card{min-height:300px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>공식암기도우미 by 서정원</h1>
+<div class="sub"></div>
+
+<div class="panel">
+<select id="subjectSelect"></select>
+<div class="tabs" id="tabs"></div>
+</div>
+
+<div class="panel">
+<div class="card" id="card" onclick="flip()">
+<div class="badge" id="badge"></div>
+<div id="content"></div>
+</div>
+<div class="hint"></div>
+<div class="actions">
+<button class="right" onclick="known()">아는거다</button>
+<button class="wrong" onclick="hold()">몰랐다</button>
+</div>
+<div class="row"><span class="score" id="score">정답 0 / 0</span><span class="small"></span></div>
+</div>
+
+<div class="panel small">
+<b>주요 기호 정리</b>
+<div id="symbols" class="symbol-grid"></div>
+</div>
+</div>
+
+<script>
+// [단원명, 질문/주제, 정답]
+const physicsData = [
+  // 등가속도 운동
+  ["등가속도 운동", "속도 공식", "\\(v = v_0 + at\\)"],
+  ["등가속도 운동", "변위 공식", "\\(s = v_0t + \\frac{1}{2}at^2\\)"],
+  ["등가속도 운동", "속도·변위 관계 공식 (시간 t가 없을 때)", "\\(v^2-v_0^2=2as\\)"],
+  ["등가속도 운동", "초기속도 v₀, 가속도 a, 시간 t가 주어졌을 때 속도 구하는 공식", "\\(v = v_0 + at\\)"],
+  ["등가속도 운동", "시간 t가 없고 v₀, v, a, s가 주어졌을 때 어떤 공식을 쓰는가?", "\\(v^2-v_0^2=2as\\)"],
+  
+  // 자유낙하
+  ["자유낙하", "속도 공식", "\\(v=gt\\)"],
+  ["자유낙하", "낙하거리 공식", "\\(h=\\frac{1}{2}gt^2\\)"],
+  ["자유낙하", "속도·높이 관계 공식", "\\(v^2=2gh\\)"],
+  ["자유낙하", "정지 상태에서 자유낙하한 물체의 t초 후 속력", "\\(v=gt\\)"],
+  ["자유낙하", "정지 상태에서 t초 동안 떨어진 높이", "\\(h=\\frac{1}{2}gt^2\\)"],
+  
+  // 포물선 운동
+  ["포물선 운동", "x방향 변위 공식", "\\(x=v_0\\cos\\theta\\,t\\)"],
+  ["포물선 운동", "y방향 변위 공식", "\\(y=v_0\\sin\\theta\\,t-\\frac{1}{2}gt^2\\)"],
+  ["포물선 운동", "최고점 도달시간 공식", "\\(t=\\frac{v_0\\sin\\theta}{g}\\)"],
+  ["포물선 운동", "최고점 높이 공식", "\\(H=\\frac{v_0^2\\sin^2\\theta}{2g}\\)"],
+  ["포물선 운동", "수평 도달거리 공식", "\\(R=\\frac{v_0^2\\sin 2\\theta}{g}\\)"],
+  
+  // 등속 원운동
+  ["등속 원운동", "각속도 정의 공식", "\\(\\omega=\\frac{\\Delta\\theta}{\\Delta t}\\)"],
+  ["등속 원운동", "각속도와 주기의 관계식", "\\(\\omega=\\frac{2\\pi}{T}\\)"],
+  ["등속 원운동", "선속도 정의 공식", "\\(v=\\frac{\\Delta s}{\\Delta t}\\)"],
+  ["등속 원운동", "선속도와 주기의 관계식", "\\(v=\\frac{2\\pi r}{T}\\)"],
+  ["등속 원운동", "선속도와 각속도의 관계식", "\\(v=r\\omega\\)"],
+  ["등속 원운동", "주기 공식 (선속도 v 이용)", "\\(T=\\frac{2\\pi r}{v}\\)"],
+  ["등속 원운동", "주기 공식 (각속도 ω 이용)", "\\(T=\\frac{2\\pi}{\\omega}\\)"],
+  ["등속 원운동", "구심가속도 공식 (v와 r 이용)", "\\(a=\\frac{v^2}{r}\\)"],
+  ["등속 원운동", "구심가속도 공식 (r과 ω 이용)", "\\(a=r\\omega^2\\)"],
+  ["등속 원운동", "구심가속도 공식 (v와 ω 이용)", "\\(a=v\\omega\\)"],
+  ["등속 원운동", "구심력 기본 공식", "\\(F=ma\\)"],
+  ["등속 원운동", "구심력 공식 (v와 r 이용)", "\\(F=\\frac{mv^2}{r}\\)"],
+  ["등속 원운동", "구심력 공식 (r과 ω 이용)", "\\(F=mr\\omega^2\\)"],
+  
+  // 탈출속도·인공위성
+  ["만유인력·위성", "만유인력 공식", "\\(F=G\\frac{m_1m_2}{r^2}\\)"],
+  ["만유인력·위성", "케플러 제3법칙(조화의 법칙) 공식", "\\(T^2=\\frac{4\\pi^2r^3}{GM}\\)"],
+  ["만유인력·위성", "인공위성의 원궤도 속력 공식", "\\(v=\\sqrt{\\frac{GM}{r}}\\)"],
+  ["만유인력·위성", "중력장 내 역학적 에너지 공식", "\\(E=\\frac{1}{2}mv^2-\\frac{GMm}{R}\\)"],
+  ["만유인력·위성", "탈출속도 공식", "\\(v_e=\\sqrt{\\frac{2GM}{R}}\\)"],
+  
+  // 운동량
+  ["운동량", "운동량 공식", "\\(p=mv\\)"],
+  ["운동량", "질량 m인 물체가 속도 v로 운동할 때 운동량", "\\(p=mv\\)"],
+  
+  // 열팽창·열전도
+  ["열역학", "열전도에 의한 열량 공식", "\\(Q=\\frac{kA(T_1-T_2)t}{l}\\)"],
+  ["열역학", "선팽창 공식", "\\(l=l_0(1+\\alpha\\Delta T)\\)"],
+  ["열역학", "부피팽창 공식", "\\(V=V_0(1+\\beta\\Delta T)\\)"],
+  
+  // 열량·비열·잠열
+  ["열량·비열", "비열 공식", "\\(c=\\frac{Q}{m\\Delta T}\\)"],
+  ["열량·비열", "열량 공식", "\\(Q=cm\\Delta T\\)"],
+  ["열량·비열", "열용량 공식", "\\(C=cm\\)"],
+  ["열량·비열", "잠열 공식", "\\(L=\\frac{Q}{m}\\)"],
+  
+  // 이상기체
+  ["이상기체", "이상기체방정식", "\\(PV=nRT\\)"]
+];
+
+const chemistryData = [
+  // 기체 법칙
+  ["기체 법칙", "보일의 법칙 관계식", "\\(V \\propto \\frac{1}{P}\\)"],
+  ["기체 법칙", "보일의 법칙 일정 조건", "온도(T), 몰수(n) 일정"],
+  ["기체 법칙", "샤를의 법칙 비례식", "\\(V \\propto T\\)"],
+  ["기체 법칙", "샤를의 법칙 일정 조건", "압력(P), 몰수(n) 일정"],
+  ["기체 법칙", "샤를의 법칙 섭씨온도 공식", "\\(V_t = V_0 + \\frac{V_0}{273}t\\)"],
+  ["기체 법칙", "아보가드로 법칙 관계식", "\\(V \\propto n\\)"],
+  ["기체 법칙", "아보가드로 법칙 일정 조건", "온도(T), 압력(P) 일정"],
+  ["기체 법칙", "이상기체방정식 기본형", "\\(PV = nRT\\)"],
+  ["기체 법칙", "질량(w)과 분자량(M)을 포함한 이상기체방정식", "\\(PV = \\frac{w}{M}RT\\)"],
+  ["기체 법칙", "이상기체방정식으로 분자량(M)을 구하는 식", "\\(M = \\frac{wRT}{PV}\\)"],
+  
+  // 액체 및 상변화
+  ["액체·상평형", "온도 증가에 따른 증기압 변화", "온도가 높아질수록 증기압 증가"],
+  ["액체·상평형", "분자 간 인력과 증기압의 관계", "분자 간 인력이 작을수록 증기압이 큼"],
+  ["액체·상평형", "상평형 그림에서 삼중점의 의미", "고체, 액체, 기체 세 상이 공존하는 상태"],
+  ["액체·상평형", "물의 융해 곡선 기울기 특성", "음(-)의 기울기 (압력 증가 시 어는점 낮아짐)"],
+  
+  // 분자 결정 세분화
+  ["분자 결정", "구성 입자", "분자"],
+  ["분자 결정", "입자 간 인력", "분자 간 힘 (분산력, 쌍극자-쌍극자 힘, 수소 결합)"],
+  ["분자 결정", "전기전도성", "고체: 없음 / 액체: 없음"],
+  ["분자 결정", "녹는점 높낮이", "상대적으로 낮음"],
+  ["분자 결정", "대표 예시 2가지", "얼음, 드라이아이스"],
+
+  // 공유(망상) 결정 세분화
+  ["공유 결정", "구성 입자", "원자"],
+  ["공유 결정", "입자 간 인력", "공유 결합"],
+  ["공유 결정", "전기전도성", "고체: 없음 (단, 흑연은 예외로 있음) / 액체: 없음"],
+  ["공유 결정", "녹는점 높낮이", "매우 높음"],
+  ["공유 결정", "대표 예시 2가지", "다이아몬드, 석영(SiO₂)"],
+
+  // 이온 결정 세분화
+  ["이온 결정", "구성 입자", "양이온과 음이온"],
+  ["이온 결정", "입자 간 인력", "정전기적 인력 (이온 결합)"],
+  ["이온 결정", "전기전도성", "고체: 없음 / 액체 및 수용액: 있음"],
+  ["이온 결정", "녹는점 높낮이", "비교적 높음"],
+  ["이온 결정", "대표 예시 2가지", "염화 나트륨(NaCl), 탄산 칼슘(CaCO₃)"],
+
+  // 금속 결정 세분화
+  ["금속 결정", "구성 입자", "금속 양이온과 자유 전자"],
+  ["금속 결정", "입자 간 인력", "금속 결합"],
+  ["금속 결정", "전기전도성", "고체: 있음 / 액체: 있음"],
+  ["금속 결정", "기계적 특성", "연성(뽑힘성)과 전성(펴짐성)이 우수함"],
+  ["금속 결정", "대표 예시 2가지", "철(Fe), 구리(Cu)"],
+
+  // 물의 특성 및 현상
+  ["물의 특성", "수소 결합에 의해 물의 끓는점/어는점이 갖는 특징", "분자량에 비해 끓는점과 어는점이 매우 높음"],
+  ["물의 특성", "수소 결합에 의해 물의 비열과 표면장력이 갖는 특징", "다른 액체에 비해 비열과 표면장력이 매우 큼"],
+  ["물의 특성", "물 결빙 시 부피와 밀도의 변화", "부피 증가, 밀도 감소 (얼음이 물에 뜸)"],
+  ["물리적 현상", "비열의 정의", "물질 1 g의 온도를 1 ℃ 올리는 데 필요한 열량"],
+  ["물리적 현상", "표면장력의 정의", "액체 표면적을 최소화하려는 힘"],
+  ["모세관 현상", "물에서의 부착력 vs 응집력 크기 비교 및 모양", "부착력 > 응집력 (오목함, 관을 따라 상승)"],
+  ["모세관 현상", "수은에서의 부착력 vs 응집력 크기 비교 및 모양", "응집력 > 부착력 (볼록함, 관을 따라 하강)"],
+  
+  // 묽은 용액의 성질
+  ["묽은 용액", "증기압 내림의 정의", "비휘발성 용질을 녹일 때 용매의 몰분율 감소로 증기압이 낮아지는 현상"],
+  ["묽은 용액", "끓는점 오름 공식", "\\(\\Delta T_b = K_b \\cdot m \\cdot i\\)"],
+  ["묽은 용액", "어는점 내림 공식", "\\(\\Delta T_f = K_f \\cdot m \\cdot i\\)"],
+  ["묽은 용액", "삼투압 공식 (반트호프 법칙)", "\\(\\pi = CRT\\) (또는 \\(\\pi = iCRT\\))"],
+  
+  // 농도
+  ["농도", "몰농도(M) 정의 및 공식", "\\(\\text{몰농도}(M) = \\frac{\\text{용질의 몰수(mol)}}{\\text{용액의 부피(L)}}\\)"],
+  ["농도", "몰랄농도(m) 정의 및 공식", "\\(\\text{몰랄농도}(m) = \\frac{\\text{용질의 몰수(mol)}}{\\text{용매의 질량(kg)}}\\)"]
+];
+
+const physicsSymbols = {
+  "Q":"열량(전달된 열에너지)","k":"열전도율","A":"열이 전달되는 단면적","T₁":"높은 쪽의 온도","T₂":"낮은 쪽의 온도","t":"열이 전달된 시간","l":"길이 또는 두 지점 사이의 거리",
+  "l₀":"처음 길이","Δl":"길이의 변화량","α":"선팽창계수","ΔT":"온도 변화량","V":"부피","V₀":"처음 부피","ΔV":"부피의 변화량","β":"부피팽창계수",
+  "c":"비열","m":"질량","C":"열용량","L":"잠열","P":"압력","n":"물질의 양(몰수)","R":"기체상수","T":"절대온도(K)",
+  "v":"속도(문맥에 따라 선속도)","v₀":"처음 속도","a":"가속도","s":"변위","g":"중력가속도","r":"반지름","ω":"각속도","F":"힘","G":"만유인력 상수","M":"중심 천체의 질량","E":"역학적 에너지"
+};
+
+const chemistrySymbols = {
+  "P":"압력","V":"부피","T":"절대온도(K)","t":"섭씨온도(℃)","n":"몰수(mol)",
+  "R":"기체상수","w":"질량(g)","M":"분자량 / 몰농도","m":"몰랄농도",
+  "π":"삼투압","C":"몰농도","i":"반트호프 계수","K_b":"끓는점 오름 상수","K_f":"어는점 내림 상수"
+};
+
+const subjects = {
+  "물리": { data: physicsData, symbols: physicsSymbols },
+  "화학": { data: chemistryData, symbols: chemistrySymbols }
+};
+
+let currentSubject = "물리";
+let deck = [], idx = 0, flipped = false, correct = 0, answered = 0;
+
+const selectEl = document.getElementById("subjectSelect");
+const tabsEl = document.getElementById("tabs");
+
+Object.keys(subjects).forEach(sub => {
+  let opt = document.createElement("option");
+  opt.value = sub;
+  opt.textContent = sub;
+  selectEl.appendChild(opt);
+});
+
+selectEl.onchange = (e) => {
+  currentSubject = e.target.value;
+  buildTabs();
+  reset();
+};
+
+function buildTabs(){
+  tabsEl.innerHTML = "";
+  Object.keys(subjects).forEach(sub => {
+    let btn = document.createElement("button");
+    btn.textContent = sub;
+    btn.className = sub === currentSubject ? "on" : "";
+    btn.onclick = () => {
+      currentSubject = sub;
+      selectEl.value = sub;
+      buildTabs();
+      reset();
+    };
+    tabsEl.appendChild(btn);
+  });
+}
+
+function reset(){
+  deck = JSON.parse(JSON.stringify(subjects[currentSubject].data));
+  shuffle(deck);
+  idx = 0;
+  flipped = false;
+  correct = 0;
+  answered = 0;
+  
+  const syms = subjects[currentSubject].symbols;
+  document.getElementById("symbols").innerHTML = Object.entries(syms)
+    .map(([k,v]) => `<div><b>${k}</b> : ${v}</div>`).join("");
+    
+  render();
+}
+
+function shuffle(a){
+  for(let i = a.length - 1; i > 0; i--){
+    let j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function render(){
+  if(!deck.length) return;
+  let [unit, topic, answer] = deck[idx];
+  document.getElementById("badge").textContent = currentSubject + " · " + (idx + 1) + "/" + deck.length;
+  
+  let question = `<span class="unit-tag">[${unit}]</span>${topic}`;
+  
+  const contentEl = document.getElementById("content");
+  contentEl.innerHTML = flipped ? `<div class="a">${answer}</div>` : `<div class="q">${question}</div>`;
+  document.getElementById("score").textContent = `정답 ${correct} / ${answered}`;
+  
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([contentEl]);
+  }
+}
+
+function flip(){
+  flipped = !flipped;
+  render();
+}
+
+function next(){
+  idx = (idx + 1) % deck.length;
+  flipped = false;
+  render();
+}
+
+function known(){
+  answered++;
+  correct++;
+  next();
+}
+
+function hold(){
+  answered++;
+  let current = deck[idx];
+  deck.splice(idx, 1);
+  deck.push(current);
+  if(idx >= deck.length) idx = 0;
+  flipped = false;
+  render();
+}
+
+buildTabs();
+reset();
+</script>
+</body>
+</html>
