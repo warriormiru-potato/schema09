@@ -3,27 +3,54 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>공식암기도우미 by 서정원</title>
+
+<!-- MathJax 설정 및 스크립트 로드 -->
 <script>
 window.MathJax = {
-  tex: {inlineMath: [['\\(','\\)'], ['$', '$']]},
-  svg: {fontCache: 'global'}
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']]
+  },
+  svg: {
+    fontCache: 'global'
+  },
+  startup: {
+    pageReady: () => {
+      return MathJax.startup.defaultPageReady().then(() => {
+        if (typeof render === 'function') {
+          render();
+        }
+      });
+    }
+  }
 };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-<title>물리화학도우미</title>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
 <style>
-*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:#f4f6fb;color:#182033}
+*{box-sizing:border-box} 
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:#f4f6fb;color:#182033}
 .wrap{max-width:760px;margin:auto;padding:18px}
-h1{font-size:26px;margin:8px 0}.sub{color:#687086;margin-bottom:16px}
+h1{font-size:26px;margin:8px 0}
+.sub{color:#687086;margin-bottom:16px}
 .panel{background:white;border-radius:18px;padding:16px;box-shadow:0 5px 20px #0000000d;margin-bottom:14px}
 select,button{font:inherit;border:0;border-radius:12px;padding:12px 14px;cursor:pointer}
-select{width:100%;background:#eef1f7}.tabs{display:flex;gap:8px;overflow-x:auto;margin:12px 0;padding-bottom:4px}.tabs button{white-space:nowrap;background:#eef1f7;flex:1}.tabs button.on{background:#182033;color:white}
+select{width:100%;background:#eef1f7}
+.tabs{display:flex;gap:8px;overflow-x:auto;margin:12px 0;padding-bottom:4px}
+.tabs button{white-space:nowrap;background:#eef1f7;flex:1}
+.tabs button.on{background:#182033;color:white}
 .card{min-height:270px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;border:2px solid #e6e9f0;border-radius:18px;padding:28px;position:relative}
-.badge{position:absolute;top:14px;left:14px;font-size:13px;color:#667085}.q{font-size:22px;font-weight:750;line-height:1.5}.a{font-size:25px;font-weight:800;line-height:1.5;color:#1d2939}
+.badge{position:absolute;top:14px;left:14px;font-size:13px;color:#667085}
+.q{font-size:22px;font-weight:750;line-height:1.5}
+.a{font-size:25px;font-weight:800;line-height:1.5;color:#1d2939}
 .unit-tag{color:#3b82f6;font-weight:800;margin-right:6px}
 .hint{color:#7b8498;font-size:13px;margin-top:10px;text-align:center}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.actions button{font-weight:700}.wrong{background:#ffe7e7}.right{background:#e3f7eb}
-.row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}.score{font-weight:750}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.actions button{font-weight:700}
+.wrong{background:#ffe7e7}
+.right{background:#e3f7eb}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.score{font-weight:750}
 .small{font-size:13px;color:#70798d}
 .symbol-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:8px;margin-top:10px}
 @media(max-width:500px){.q{font-size:18px}.a{font-size:21px}.card{min-height:300px}}
@@ -31,35 +58,37 @@ select{width:100%;background:#eef1f7}.tabs{display:flex;gap:8px;overflow-x:auto;
 </head>
 <body>
 <div class="wrap">
-<h1>공식암기도우미 by 서정원</h1>
-<div class="sub"></div>
+  <h1>공식암기도우미 by 서정원</h1>
+  <div class="sub">물리 및 화학 주요 공식 카드</div>
 
-<div class="panel">
-<select id="subjectSelect"></select>
-<div class="tabs" id="tabs"></div>
-</div>
+  <div class="panel">
+    <select id="subjectSelect"></select>
+    <div class="tabs" id="tabs"></div>
+  </div>
 
-<div class="panel">
-<div class="card" id="card" onclick="flip()">
-<div class="badge" id="badge"></div>
-<div id="content"></div>
-</div>
-<div class="hint"></div>
-<div class="actions">
-<button class="right" onclick="known()">아는거다</button>
-<button class="wrong" onclick="hold()">몰랐다</button>
-</div>
-<div class="row"><span class="score" id="score">정답 0 / 0</span><span class="small"></span></div>
-</div>
+  <div class="panel">
+    <div class="card" id="card" onclick="flip()">
+      <div class="badge" id="badge"></div>
+      <div id="content"></div>
+    </div>
+    <div class="hint">카드를 클릭하면 정답이 보입니다.</div>
+    <div class="actions">
+      <button class="right" onclick="known()">아는거다</button>
+      <button class="wrong" onclick="hold()">몰랐다</button>
+    </div>
+    <div class="row">
+      <span class="score" id="score">정답 0 / 0</span>
+      <span class="small"></span>
+    </div>
+  </div>
 
-<div class="panel small">
-<b>주요 기호 정리</b>
-<div id="symbols" class="symbol-grid"></div>
-</div>
+  <div class="panel small">
+    <b>주요 기호 정리</b>
+    <div id="symbols" class="symbol-grid"></div>
+  </div>
 </div>
 
 <script>
-// [단원명, 질문/주제, 정답]
 const physicsData = [
   // 등가속도 운동
   ["등가속도 운동", "속도 공식", "\\(v = v_0 + at\\)"],
@@ -68,6 +97,41 @@ const physicsData = [
   ["등가속도 운동", "초기속도 v₀, 가속도 a, 시간 t가 주어졌을 때 속도 구하는 공식", "\\(v = v_0 + at\\)"],
   ["등가속도 운동", "시간 t가 없고 v₀, v, a, s가 주어졌을 때 어떤 공식을 쓰는가?", "\\(v^2-v_0^2=2as\\)"],
   
+  // 운동방정식 기본
+  ["운동방정식", "뉴턴 운동 제2법칙 (운동방정식 기본형)", "\\(F_{net} = ma\\)"],
+  ["운동방정식", "두 물체(m_A, m_B)가 함께 움직일 때 전체 가속도 a", "\\(a = \\frac{F}{m_A + m_B}\\)"],
+  ["운동방정식", "앞물체 A를 당길 때 B가 받는 알짜힘 (A, B가 붙어 움직일 때)", "\\(F_B = m_B a = m_B \\frac{F}{m_A + m_B}\\)"],
+  
+  // 장력 (Tension)
+  ["장력", "평평한 바닥에서 수평 힘 F로 A, B(실로 연결)를 당길 때 전체 가속도", "\\(a = \\frac{F}{m_A + m_B}\\)"],
+  ["장력", "평평한 바닥에서 A를 F로 당길 때 A, B 사이 실의 장력 T", "\\(T = m_B a = \\frac{m_B F}{m_A + m_B}\\)"],
+  ["장력", "도르래: m_A, m_B(m_B > m_A)가 매달려 떨어질 때 가속도 a", "\\(a = \\frac{(m_B - m_A)g}{m_A + m_B}\\)"],
+  ["장력", "도르래: m_A, m_B(m_B > m_A)가 매달렸을 때 실의 장력 T", "\\(T = \\frac{2m_A m_B g}{m_A + m_B}\\)"],
+  ["장력", "탁자 위 m_A와 밑으로 늘어진 m_B(도르래) 계의 가속도 a", "\\(a = \\frac{m_B g}{m_A + m_B}\\)"],
+  ["장력", "탁자 위 m_A와 밑으로 늘어진 m_B(도르래) 계의 실 장력 T", "\\(T = m_A a = \\frac{m_A m_B g}{m_A + m_B}\\)"],
+
+  // 빗면 운동 (Incline)
+  ["빗면 운동", "경사각 θ인 마찰 없는 빗면에서 물체의 밑방향 중력 분력", "\\(F_{parallel} = mg \\sin\\theta\\)"],
+  ["빗면 운동", "경사각 θ인 빗면에 수직한 중력 분력 (수직항력 N과 같음)", "\\(F_{normal} = N = mg \\cos\\theta\\)"],
+  ["빗면 운동", "마찰 없는 빗면을 미끄러져 내려가는 물체의 가속도 a", "\\(a = g \\sin\\theta\\)"],
+  ["빗면 운동", "높이 h, 경사각 θ인 마찰 없는 빗면 바닥 도달 속력 v", "\\(v = \\sqrt{2gh}\\)"],
+  ["빗면 운동", "동마찰계수 μ_k가 있는 빗면에서 운동 마찰력 F_k", "\\(F_k = \\mu_k mg \\cos\\theta\\)"],
+  ["빗면 운동", "마찰 있는 빗면에서 내려가는 물체의 알짜 가속도 a", "\\(a = g(\\sin\\theta - \\mu_k \\cos\\theta)\\)"],
+  ["빗면 운동", "물체가 빗면에서 정지해 있기 위한 정지 마찰계수 조건 (최대정지각)", "\\(\\mu_s = \\tan\\theta\\)"],
+  ["빗면 운동", "빗면에 줄로 묶인 물체 m이 정지해 있을 때 줄의 장력 T", "\\(T = mg \\sin\\theta\\)"],
+
+  // 수평으로 던진 물체의 운동
+  ["수평 던진 운동", "수평으로 던진 물체의 수평 방향 운동 형태", "등속도 운동"],
+  ["수평 던진 운동", "수평으로 던진 물체의 연직 방향 운동 형태", "자유 낙하 운동"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 수평 방향 속도(v_x)", "\\(v_x = v_0\\)"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 연직 방향 속도(v_y)", "\\(v_y = gt\\)"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 전체 속도의 크기(v)", "\\(v = \\sqrt{v_0^2 + (gt)^2}\\)"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 수평 이동 거리(x)", "\\(x = v_0 t\\)"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 연직 낙하 거리(y)", "\\(y = \\frac{1}{2}gt^2\\)"],
+  ["수평 던진 운동", "높이 h에서 수평으로 던졌을 때 바닥 도달 시간(t)", "\\(t = \\sqrt{\\frac{2h}{g}}\\)"],
+  ["수평 던진 운동", "높이 h에서 속력 v₀로 수평으로 던졌을 때 최대 수평 도달 거리(R)", "\\(R = v_0 \\sqrt{\\frac{2h}{g}}\\)"],
+  ["수평 던진 운동", "수평으로 던진 물체의 궤적 방정식 (x와 y의 관계)", "\\(y = \\frac{g}{2v_0^2}x^2\\)"],
+
   // 자유낙하
   ["자유낙하", "속도 공식", "\\(v=gt\\)"],
   ["자유낙하", "낙하거리 공식", "\\(h=\\frac{1}{2}gt^2\\)"],
@@ -124,7 +188,6 @@ const physicsData = [
 ];
 
 const chemistryData = [
-  // 기체 법칙
   ["기체 법칙", "보일의 법칙 관계식", "\\(V \\propto \\frac{1}{P}\\)"],
   ["기체 법칙", "보일의 법칙 일정 조건", "온도(T), 몰수(n) 일정"],
   ["기체 법칙", "샤를의 법칙 비례식", "\\(V \\propto T\\)"],
@@ -135,42 +198,30 @@ const chemistryData = [
   ["기체 법칙", "이상기체방정식 기본형", "\\(PV = nRT\\)"],
   ["기체 법칙", "질량(w)과 분자량(M)을 포함한 이상기체방정식", "\\(PV = \\frac{w}{M}RT\\)"],
   ["기체 법칙", "이상기체방정식으로 분자량(M)을 구하는 식", "\\(M = \\frac{wRT}{PV}\\)"],
-  
-  // 액체 및 상변화
   ["액체·상평형", "온도 증가에 따른 증기압 변화", "온도가 높아질수록 증기압 증가"],
   ["액체·상평형", "분자 간 인력과 증기압의 관계", "분자 간 인력이 작을수록 증기압이 큼"],
   ["액체·상평형", "상평형 그림에서 삼중점의 의미", "고체, 액체, 기체 세 상이 공존하는 상태"],
   ["액체·상평형", "물의 융해 곡선 기울기 특성", "음(-)의 기울기 (압력 증가 시 어는점 낮아짐)"],
-  
-  // 분자 결정 세분화
   ["분자 결정", "구성 입자", "분자"],
   ["분자 결정", "입자 간 인력", "분자 간 힘 (분산력, 쌍극자-쌍극자 힘, 수소 결합)"],
   ["분자 결정", "전기전도성", "고체: 없음 / 액체: 없음"],
   ["분자 결정", "녹는점 높낮이", "상대적으로 낮음"],
   ["분자 결정", "대표 예시 2가지", "얼음, 드라이아이스"],
-
-  // 공유(망상) 결정 세분화
   ["공유 결정", "구성 입자", "원자"],
   ["공유 결정", "입자 간 인력", "공유 결합"],
   ["공유 결정", "전기전도성", "고체: 없음 (단, 흑연은 예외로 있음) / 액체: 없음"],
   ["공유 결정", "녹는점 높낮이", "매우 높음"],
   ["공유 결정", "대표 예시 2가지", "다이아몬드, 석영(SiO₂)"],
-
-  // 이온 결정 세분화
   ["이온 결정", "구성 입자", "양이온과 음이온"],
   ["이온 결정", "입자 간 인력", "정전기적 인력 (이온 결합)"],
   ["이온 결정", "전기전도성", "고체: 없음 / 액체 및 수용액: 있음"],
   ["이온 결정", "녹는점 높낮이", "비교적 높음"],
   ["이온 결정", "대표 예시 2가지", "염화 나트륨(NaCl), 탄산 칼슘(CaCO₃)"],
-
-  // 금속 결정 세분화
   ["금속 결정", "구성 입자", "금속 양이온과 자유 전자"],
   ["금속 결정", "입자 간 인력", "금속 결합"],
   ["금속 결정", "전기전도성", "고체: 있음 / 액체: 있음"],
   ["금속 결정", "기계적 특성", "연성(뽑힘성)과 전성(펴짐성)이 우수함"],
   ["금속 결정", "대표 예시 2가지", "철(Fe), 구리(Cu)"],
-
-  // 물의 특성 및 현상
   ["물의 특성", "수소 결합에 의해 물의 끓는점/어는점이 갖는 특징", "분자량에 비해 끓는점과 어는점이 매우 높음"],
   ["물의 특성", "수소 결합에 의해 물의 비열과 표면장력이 갖는 특징", "다른 액체에 비해 비열과 표면장력이 매우 큼"],
   ["물의 특성", "물 결빙 시 부피와 밀도의 변화", "부피 증가, 밀도 감소 (얼음이 물에 뜸)"],
@@ -178,23 +229,21 @@ const chemistryData = [
   ["물리적 현상", "표면장력의 정의", "액체 표면적을 최소화하려는 힘"],
   ["모세관 현상", "물에서의 부착력 vs 응집력 크기 비교 및 모양", "부착력 > 응집력 (오목함, 관을 따라 상승)"],
   ["모세관 현상", "수은에서의 부착력 vs 응집력 크기 비교 및 모양", "응집력 > 부착력 (볼록함, 관을 따라 하강)"],
-  
-  // 묽은 용액의 성질
   ["묽은 용액", "증기압 내림의 정의", "비휘발성 용질을 녹일 때 용매의 몰분율 감소로 증기압이 낮아지는 현상"],
   ["묽은 용액", "끓는점 오름 공식", "\\(\\Delta T_b = K_b \\cdot m \\cdot i\\)"],
   ["묽은 용액", "어는점 내림 공식", "\\(\\Delta T_f = K_f \\cdot m \\cdot i\\)"],
   ["묽은 용액", "삼투압 공식 (반트호프 법칙)", "\\(\\pi = CRT\\) (또는 \\(\\pi = iCRT\\))"],
-  
-  // 농도
   ["농도", "몰농도(M) 정의 및 공식", "\\(\\text{몰농도}(M) = \\frac{\\text{용질의 몰수(mol)}}{\\text{용액의 부피(L)}}\\)"],
   ["농도", "몰랄농도(m) 정의 및 공식", "\\(\\text{몰랄농도}(m) = \\frac{\\text{용질의 몰수(mol)}}{\\text{용매의 질량(kg)}}\\)"]
 ];
 
 const physicsSymbols = {
-  "Q":"열량(전달된 열에너지)","k":"열전도율","A":"열이 전달되는 단면적","T₁":"높은 쪽의 온도","T₂":"낮은 쪽의 온도","t":"열이 전달된 시간","l":"길이 또는 두 지점 사이의 거리",
-  "l₀":"처음 길이","Δl":"길이의 변화량","α":"선팽창계수","ΔT":"온도 변화량","V":"부피","V₀":"처음 부피","ΔV":"부피의 변화량","β":"부피팽창계수",
-  "c":"비열","m":"질량","C":"열용량","L":"잠열","P":"압력","n":"물질의 양(몰수)","R":"기체상수","T":"절대온도(K)",
-  "v":"속도(문맥에 따라 선속도)","v₀":"처음 속도","a":"가속도","s":"변위","g":"중력가속도","r":"반지름","ω":"각속도","F":"힘","G":"만유인력 상수","M":"중심 천체의 질량","E":"역학적 에너지"
+  "v_x":"수평 방향 속도","v_y":"연직 방향 속도","R":"최대 수평 도달 거리","h":"낙하 높이",
+  "T":"장력(Tension)","N":"수직항력","θ":"경사각","μ_s":"정지 마찰계수","μ_k":"동마찰계수","F_k":"동마찰력",
+  "Q":"열량","k":"열전도율","A":"단면적","T₁":"고온","T₂":"저온","t":"시간","l":"길이",
+  "l₀":"처음 길이","Δl":"길이 변화량","α":"선팽창계수","ΔT":"온도 변화량","V":"부피","V₀":"처음 부피","β":"부피팽창계수",
+  "c":"비열","m":"질량","C":"열용량","L":"잠열","P":"압력","n":"몰수","R":"기체상수",
+  "v":"속도","v₀":"처음 속도","a":"가속도","s":"변위","g":"중력가속도","r":"반지름","ω":"각속도","F":"힘","G":"만유인력 상수","M":"천체 질량","E":"역학적 에너지"
 };
 
 const chemistrySymbols = {
@@ -278,7 +327,7 @@ function render(){
   document.getElementById("score").textContent = `정답 ${correct} / ${answered}`;
   
   if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([contentEl]);
+    window.MathJax.typesetPromise([contentEl]).catch((err) => console.log(err));
   }
 }
 
@@ -309,6 +358,7 @@ function hold(){
   render();
 }
 
+// 초기화
 buildTabs();
 reset();
 </script>
