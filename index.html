@@ -34,17 +34,15 @@ body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;back
 h1{font-size:26px;margin:8px 0}
 .sub{color:#687086;margin-bottom:16px}
 .panel{background:white;border-radius:18px;padding:16px;box-shadow:0 5px 20px #0000000d;margin-bottom:14px}
-.select-group{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 select,button{font:inherit;border:0;border-radius:12px;padding:12px 14px;cursor:pointer}
 select{width:100%;background:#eef1f7}
 .tabs{display:flex;gap:8px;overflow-x:auto;margin:12px 0;padding-bottom:4px}
 .tabs button{white-space:nowrap;background:#eef1f7;flex:1}
 .tabs button.on{background:#182033;color:white}
-.card{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;border:2px solid #e6e9f0;border-radius:18px;padding:28px 20px;position:relative}
+.card{min-height:270px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;border:2px solid #e6e9f0;border-radius:18px;padding:28px;position:relative}
 .badge{position:absolute;top:14px;left:14px;font-size:13px;color:#667085}
-.card-img{max-width:100%;max-height:180px;border-radius:8px;margin-bottom:12px;object-fit:contain;display:none}
-.q{font-size:20px;font-weight:750;line-height:1.5}
-.a{font-size:22px;font-weight:800;line-height:1.5;color:#1d2939}
+.q{font-size:22px;font-weight:750;line-height:1.5}
+.a{font-size:25px;font-weight:800;line-height:1.5;color:#1d2939}
 .unit-tag{color:#3b82f6;font-weight:800;margin-right:6px}
 .hint{color:#7b8498;font-size:13px;margin-top:10px;text-align:center}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
@@ -55,7 +53,7 @@ select{width:100%;background:#eef1f7}
 .score{font-weight:750}
 .small{font-size:13px;color:#70798d}
 .symbol-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:8px;margin-top:10px}
-@media(max-width:500px){.select-group{grid-template-columns:1fr}.q{font-size:17px}.a{font-size:19px}.card{min-height:320px}}
+@media(max-width:500px){.q{font-size:18px}.a{font-size:21px}.card{min-height:300px}}
 </style>
 </head>
 <body>
@@ -64,17 +62,13 @@ select{width:100%;background:#eef1f7}
   <div class="sub">물리 및 화학 주요 공식 카드</div>
 
   <div class="panel">
-    <div class="select-group">
-      <select id="subjectSelect"></select>
-      <select id="unitSelect"></select>
-    </div>
+    <select id="subjectSelect"></select>
     <div class="tabs" id="tabs"></div>
   </div>
 
   <div class="panel">
     <div class="card" id="card" onclick="flip()">
       <div class="badge" id="badge"></div>
-      <img id="cardImg" class="card-img" alt="문제 상황 이미지" onerror="this.style.display='none'">
       <div id="content"></div>
     </div>
     <div class="hint">카드를 클릭하면 정답이 보입니다.</div>
@@ -95,78 +89,167 @@ select{width:100%;background:#eef1f7}
 </div>
 
 <script>
-// 데이터 구조: [단원, 질문 문장, 정답 문장, 이미지경로(선택)]
 const physicsData = [
-  // 1. 빗면에서의 운동
-  ["빗면 운동", "마찰이 없는 빗면에 놓인 물체에 작용하는 중력 성분 중 수직 항력과 평형을 이루는 힘은?", "\\(mg\\cos\\theta\\) (중력의 y성분)"],
-  ["빗면 운동", "마찰이 없는 빗면 위의 물체에 작용하는 알짜힘과 이 물체의 운동 형태는?", "알짜힘: \\(mg\\sin\\theta\\)<br>운동: 등가속도 운동"],
-  ["빗면 운동", "마찰을 무시할 수 있는 빗면을 미끄러져 내려가는 물체의 가속도 공식은?", "\\(a = g\\sin\\theta\\)"],
-  ["빗면 운동", "마찰이 존재하는 빗면 위의 물체에 작용하는 3가지 힘은?", "중력, 수직 항력, 마찰력"],
-  ["빗면 운동", "마찰이 있는 빗면에서 운동하는 물체의 알짜힘 식은?", "\\(mg\\sin\\theta - f\\)"],
-  ["빗면 운동", "마찰이 있는 빗면에서 \\(mg\\sin\\theta > f\\) 조건일 때 물체의 운동 상태는?", "등가속도 운동"],
-  ["빗면 운동", "마찰이 있는 빗면에서 \\(mg\\sin\\theta = f\\) 조건일 때 물체의 운동 상태는?", "정지 상태 유지 또는 등속도 운동"],
-  ["빗면 운동", "마찰이 존재하는 빗면을 따라 내려가는 물체의 가속도 공식은?", "\\(a = \\frac{mg\\sin\\theta - f}{m}\\)"],
+  // 등가속도 운동
+  ["등가속도 운동", "속도 공식", "\\(v = v_0 + at\\)"],
+  ["등가속도 운동", "변위 공식", "\\(s = v_0t + \\frac{1}{2}at^2\\)"],
+  ["등가속도 운동", "속도·변위 관계 공식 (시간 t가 없을 때)", "\\(v^2-v_0^2=2as\\)"],
+  ["등가속도 운동", "초기속도 v₀, 가속도 a, 시간 t가 주어졌을 때 속도 구하는 공식", "\\(v = v_0 + at\\)"],
+  ["등가속도 운동", "시간 t가 없고 v₀, v, a, s가 주어졌을 때 어떤 공식을 쓰는가?", "\\(v^2-v_0^2=2as\\)"],
+  
+  // 운동방정식 기본
+  ["운동방정식", "뉴턴 운동 제2법칙 (운동방정식 기본형)", "\\(F_{net} = ma\\)"],
+  ["운동방정식", "두 물체(m_A, m_B)가 함께 움직일 때 전체 가속도 a", "\\(a = \\frac{F}{m_A + m_B}\\)"],
+  ["운동방정식", "앞물체 A를 당길 때 B가 받는 알짜힘 (A, B가 붙어 움직일 때)", "\\(F_B = m_B a = m_B \\frac{F}{m_A + m_B}\\)"],
+  
+  // 장력 (Tension)
+  ["장력", "평평한 바닥에서 수평 힘 F로 A, B(실로 연결)를 당길 때 전체 가속도", "\\(a = \\frac{F}{m_A + m_B}\\)"],
+  ["장력", "평평한 바닥에서 A를 F로 당길 때 A, B 사이 실의 장력 T", "\\(T = m_B a = \\frac{m_B F}{m_A + m_B}\\)"],
+  ["장력", "도르래: m_A, m_B(m_B > m_A)가 매달려 떨어질 때 가속도 a", "\\(a = \\frac{(m_B - m_A)g}{m_A + m_B}\\)"],
+  ["장력", "도르래: m_A, m_B(m_B > m_A)가 매달렸을 때 실의 장력 T", "\\(T = \\frac{2m_A m_B g}{m_A + m_B}\\)"],
+  ["장력", "탁자 위 m_A와 밑으로 늘어진 m_B(도르래) 계의 가속도 a", "\\(a = \\frac{m_B g}{m_A + m_B}\\)"],
+  ["장력", "탁자 위 m_A와 밑으로 늘어진 m_B(도르래) 계의 실 장력 T", "\\(T = m_A a = \\frac{m_A m_B g}{m_A + m_B}\\)"],
 
-  // 2. 연결된 물체의 운동
-  ["연결된 물체", "수평 탁자 위의 물체 A와 실로 연결되어 매달린 B가 함께 움직일 때 가속도는?", "\\(a = \\frac{m_B}{m_A + m_B}g\\)"],
-  ["연결된 물체", "수평 탁자 위 A와 매달린 B가 연결된 계에서 물체 A에 작용하는 알짜힘은?", "\\(F_A = \\frac{m_A m_B}{m_A + m_B}g\\)"],
-  ["연결된 물체", "수평 탁자 위 A와 매달린 B가 연결된 계에서 물체 B에 작용하는 알짜힘은?", "\\(F_B = \\frac{m_B^2}{m_A + m_B}g\\)"],
-  ["연결된 물체", "도르래에 연결된 두 물체 A, B(\\(m_B > m_A\\))에 작용하는 전체 알짜힘의 크기는?", "\\((m_B - m_A)g\\)"],
-  ["연결된 물체", "도르래에 매달려 함께 운동하는 두 물체 A, B(\\(m_B > m_A\\))의 가속도는?", "\\(a = \\frac{m_B - m_A}{m_A + m_B}g\\)"],
-  ["연결된 물체", "빗면의 물체 A와 도르래로 매달린 물체 B가 연결된 계의 가속도 공식은?", "\\(a = \\frac{m_B - m_A\\sin\\theta}{m_A + m_B}g\\)"],
+  // 빗면 운동 (Incline)
+  ["빗면 운동", "경사각 θ인 마찰 없는 빗면에서 물체의 밑방향 중력 분력", "\\(F_{parallel} = mg \\sin\\theta\\)"],
+  ["빗면 운동", "경사각 θ인 빗면에 수직한 중력 분력 (수직항력 N과 같음)", "\\(F_{normal} = N = mg \\cos\\theta\\)"],
+  ["빗면 운동", "마찰 없는 빗면을 미끄러져 내려가는 물체의 가속도 a", "\\(a = g \\sin\\theta\\)"],
+  ["빗면 운동", "높이 h, 경사각 θ인 마찰 없는 빗면 바닥 도달 속력 v", "\\(v = \\sqrt{2gh}\\)"],
+  ["빗면 운동", "동마찰계수 μ_k가 있는 빗면에서 운동 마찰력 F_k", "\\(F_k = \\mu_k mg \\cos\\theta\\)"],
+  ["빗면 운동", "마찰 있는 빗면에서 내려가는 물체의 알짜 가속도 a", "\\(a = g(\\sin\\theta - \\mu_k \\cos\\theta)\\)"],
+  ["빗면 운동", "물체가 빗면에서 정지해 있기 위한 정지 마찰계수 조건 (최대정지각)", "\\(\\mu_s = \\tan\\theta\\)"],
+  ["빗면 운동", "빗면에 줄로 묶인 물체 m이 정지해 있을 때 줄의 장력 T", "\\(T = mg \\sin\\theta\\)"],
 
-  // 3. 자유 낙하 및 연직 상방 운동
-  ["낙하/상방", "자유 낙하하는 물체에 작용하는 알짜힘과 가속도는? (아래쪽을 +로 설정)", "알짜힘: \\(mg\\), 가속도: \\(g\\)"],
-  ["낙하/상방", "자유 낙하 운동 시 시간에 따른 속력(\\(v\\))과 낙하 거리(\\(-h\\)) 공식은?", "\\(v = gt\\), \\(h = \\frac{1}{2}gt^2\\)"],
-  ["낙하/상방", "자유 낙하 운동의 위치-시간 그래프에서 위치 변화와 시간의 비례 관계는?", "위치는 [ 시간의 제곱(\\(t^2\\)) ]에 비례하여 증가합니다."],
-  ["낙하/상방", "연직 위로 던진 물체에 작용하는 알짜힘과 가속도는? (위쪽을 +로 설정)", "알짜힘: \\(-mg\\), 가속도: \\(-g\\)"],
-  ["낙하/상방", "연직 위로 던진 물체의 속도(\\(-v\\))와 높이(\\(-h\\)) 공식은?", "\\(v = v_0 - gt\\), \\(h = v_0 t - \\frac{1}{2}gt^2\\)"],
-  ["낙하/상방", "연직 위로 던진 물체의 속력과 높이 사이의 관계식은?", "\\(v^2 - v_0^2 = -2gh\\)"],
-  ["낙하/상방", "연직 위로 던져진 물체가 최고점에 도달했을 때 순간 속도는?", "\\(v = 0\\)"],
+  // 수평으로 던진 물체의 운동
+  ["수평 던진 운동", "수평으로 던진 물체의 수평 방향 운동 형태", "등속도 운동"],
+  ["수평 던진 운동", "수평으로 던진 물체의 연직 방향 운동 형태", "자유 낙하 운동"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 수평 방향 속도(v_x)", "\\(v_x = v_0\\)"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 연직 방향 속도(v_y)", "\\(v_y = gt\\)"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 전체 속도의 크기(v)", "\\(v = \\sqrt{v_0^2 + (gt)^2}\\)"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 수평 이동 거리(x)", "\\(x = v_0 t\\)"],
+  ["수평 던진 운동", "속력 v₀로 수평으로 던진 후 t초 후 연직 낙하 거리(y)", "\\(y = \\frac{1}{2}gt^2\\)"],
+  ["수평 던진 운동", "높이 h에서 수평으로 던졌을 때 바닥 도달 시간(t)", "\\(t = \\sqrt{\\frac{2h}{g}}\\)"],
+  ["수평 던진 운동", "높이 h에서 속력 v₀로 수평으로 던졌을 때 최대 수평 도달 거리(R)", "\\(R = v_0 \\sqrt{\\frac{2h}{g}}\\)"],
+  ["수평 던진 운동", "수평으로 던진 물체의 궤적 방정식 (x와 y의 관계)", "\\(y = \\frac{g}{2v_0^2}x^2\\)"],
 
-  // 4. 진자 운동 및 경사진 곡선 도로
-  ["진자 운동", "진자 운동의 정의와 운동하는 추에 작용하는 두 가지 힘은?", "줄에 매달린 추가 왕복하는 운동이며, [ 중력(mg) ]과 [ 실의 장력(T) ]이 작용합니다."],
-  ["진자 운동", "진자 운동에서 장력이 최소가 되는 위치와 이때 알짜힘의 크기는?", "최고점(A, E)에서 장력이 최소가 되며, 알짜힘은 [ 최대 ]입니다."],
-  ["진자 운동", "진자 운동에서 장력이 최대가 되는 위치와 이때 알짜힘의 크기는?", "최저점(C)에서 장력이 최대가 되며, 알짜힘은 [ 최소(0) ]입니다."],
-  ["곡선 도로", "경사각 \\(\\theta\\)인 곡선 도로를 도는 자동차의 구심력 방정식은?", "\\(F_N \\sin\\theta = \\frac{mv^2}{r} = mg\\tan\\theta\\)"],
-  ["곡선 도로", "마찰이 없는 경사 도로에서 자동차가 미끄러지지 않고 돌 수 있는 안전 속력은?", "\\(v = \\sqrt{gr\\tan\\theta}\\)"],
-
-  // 5. 좌표계 및 관성력
-  ["좌표계", "3차원 공간에서 위치를 나타내기 위해 주로 사용되는 3가지 좌표계는?", "직교좌표계(x, y, z), 극좌표계(r, θ, ϕ), 원통좌표계(r, ϕ, z)"],
-  ["관성력", "가속도 \\(a\\)로 운동하는 가속 좌표계 내에서 관찰되는 관성력 공식은?", "\\(\\vec{f} = -m\\vec{a}\\) (가속도와 반대 방향)"],
-  ["관성력 예시", "가속도 \\(a\\)로 위쪽으로 가속 승강하는 엘리베이터 안에서의 체감 무게는?", "\\(w = m(g + a)\\)"],
-  ["관성력 예시", "가속도 \\(a\\)로 아래쪽으로 가속 하강하는 엘리베이터 안에서의 체감 무게는?", "\\(w = m(g - a)\\)"],
-  ["관성력 예시", "줄이 끊어져 자유 낙하하는 엘리베이터 내부의 관찰자가 느끼는 체감 무게는?", "무중력 상태 (체감 무게 \\(w = 0\\))"],
-  ["전향력", "지구 자전에 의해 북반구에서 이동하는 물체가 받는 코리올리 힘의 방향은?", "진행 방향의 [ 오른쪽 ] 방향"],
-
-  // 6. 상대성이론 및 블랙홀
-  ["질량/상대성", "운동 가속도로 구하는 관성 질량과 중력장 크기로 구하는 중력 질량의 관계는?", "아인슈타인의 등가원리에 의해 관성 질량과 중력 질량은 동일합니다."],
-  ["상대성이론", "아인슈타인의 등가원리 핵심 개념은?", "가속 운동 좌표계 내에서의 현상과 중력장 내에서의 현상은 서로 구분할 수 없다."],
-  ["블랙홀", "블랙홀의 경계면으로 빛조차 탈출할 수 없는 한계 영역을 무엇이라 하는가?", "사건의 지평선(Event Horizon)"],
-  ["슈바르츠실트", "질량 M인 천체의 슈바르츠실트 반지름(\\(R_s\\)) 공식은?", "\\(R_s = \\frac{2GM}{c^2}\\)"]
+  // 자유낙하
+  ["자유낙하", "속도 공식", "\\(v=gt\\)"],
+  ["자유낙하", "낙하거리 공식", "\\(h=\\frac{1}{2}gt^2\\)"],
+  ["자유낙하", "속도·높이 관계 공식", "\\(v^2=2gh\\)"],
+  ["자유낙하", "정지 상태에서 자유낙하한 물체의 t초 후 속력", "\\(v=gt\\)"],
+  ["자유낙하", "정지 상태에서 t초 동안 떨어진 높이", "\\(h=\\frac{1}{2}gt^2\\)"],
+  
+  // 포물선 운동
+  ["포물선 운동", "x방향 변위 공식", "\\(x=v_0\\cos\\theta\\,t\\)"],
+  ["포물선 운동", "y방향 변위 공식", "\\(y=v_0\\sin\\theta\\,t-\\frac{1}{2}gt^2\\)"],
+  ["포물선 운동", "최고점 도달시간 공식", "\\(t=\\frac{v_0\\sin\\theta}{g}\\)"],
+  ["포물선 운동", "최고점 높이 공식", "\\(H=\\frac{v_0^2\\sin^2\\theta}{2g}\\)"],
+  ["포물선 운동", "수평 도달거리 공식", "\\(R=\\frac{v_0^2\\sin 2\\theta}{g}\\)"],
+  
+  // 등속 원운동
+  ["등속 원운동", "각속도 정의 공식", "\\(\\omega=\\frac{\\Delta\\theta}{\\Delta t}\\)"],
+  ["등속 원운동", "각속도와 주기의 관계식", "\\(\\omega=\\frac{2\\pi}{T}\\)"],
+  ["등속 원운동", "선속도 정의 공식", "\\(v=\\frac{\\Delta s}{\\Delta t}\\)"],
+  ["등속 원운동", "선속도와 주기의 관계식", "\\(v=\\frac{2\\pi r}{T}\\)"],
+  ["등속 원운동", "선속도와 각속도의 관계식", "\\(v=r\\omega\\)"],
+  ["등속 원운동", "주기 공식 (선속도 v 이용)", "\\(T=\\frac{2\\pi r}{v}\\)"],
+  ["등속 원운동", "주기 공식 (각속도 ω 이용)", "\\(T=\\frac{2\\pi}{\\omega}\\)"],
+  ["등속 원운동", "구심가속도 공식 (v와 r 이용)", "\\(a=\\frac{v^2}{r}\\)"],
+  ["등속 원운동", "구심가속도 공식 (r과 ω 이용)", "\\(a=r\\omega^2\\)"],
+  ["등속 원운동", "구심가속도 공식 (v와 ω 이용)", "\\(a=v\\omega\\)"],
+  ["등속 원운동", "구심력 기본 공식", "\\(F=ma\\)"],
+  ["등속 원운동", "구심력 공식 (v와 r 이용)", "\\(F=\\frac{mv^2}{r}\\)"],
+  ["등속 원운동", "구심력 공식 (r과 ω 이용)", "\\(F=mr\\omega^2\\)"],
+  
+  // 탈출속도·인공위성
+  ["만유인력·위성", "만유인력 공식", "\\(F=G\\frac{m_1m_2}{r^2}\\)"],
+  ["만유인력·위성", "케플러 제3법칙(조화의 법칙) 공식", "\\(T^2=\\frac{4\\pi^2r^3}{GM}\\)"],
+  ["만유인력·위성", "인공위성의 원궤도 속력 공식", "\\(v=\\sqrt{\\frac{GM}{r}}\\)"],
+  ["만유인력·위성", "중력장 내 역학적 에너지 공식", "\\(E=\\frac{1}{2}mv^2-\\frac{GMm}{R}\\)"],
+  ["만유인력·위성", "탈출속도 공식", "\\(v_e=\\sqrt{\\frac{2GM}{R}}\\)"],
+  
+  // 운동량
+  ["운동량", "운동량 공식", "\\(p=mv\\)"],
+  ["운동량", "질량 m인 물체가 속도 v로 운동할 때 운동량", "\\(p=mv\\)"],
+  
+  // 열팽창·열전도
+  ["열역학", "열전도에 의한 열량 공식", "\\(Q=\\frac{kA(T_1-T_2)t}{l}\\)"],
+  ["열역학", "선팽창 공식", "\\(l=l_0(1+\\alpha\\Delta T)\\)"],
+  ["열역학", "부피팽창 공식", "\\(V=V_0(1+\\beta\\Delta T)\\)"],
+  
+  // 열량·비열·잠열
+  ["열량·비열", "비열 공식", "\\(c=\\frac{Q}{m\\Delta T}\\)"],
+  ["열량·비열", "열량 공식", "\\(Q=cm\\Delta T\\)"],
+  ["열량·비열", "열용량 공식", "\\(C=cm\\)"],
+  ["열량·비열", "잠열 공식", "\\(L=\\frac{Q}{m}\\)"],
+  
+  // 이상기체
+  ["이상기체", "이상기체방정식", "\\(PV=nRT\\)"]
 ];
 
 const chemistryData = [
-  ["기체 법칙", "온도가 일정할 때 기체 부피와 압력의 관계식(보일의 법칙)은?", "\\(V \\propto \\frac{1}{P}\\)"],
-  ["기체 법칙", "압력이 일정할 때 기체 부피와 절대온도의 관계식(샤를의 법칙)은?", "\\(V \\propto T\\)"],
-  ["기체 법칙", "이상기체 상태 방정식의 기본 공식은?", "\\(PV = nRT\\)"],
-  ["기체 법칙", "이상기체 상태 방정식을 변형하여 분자량(M)을 구하는 공식은?", "\\(M = \\frac{wRT}{PV}\\)"],
-  ["액체·상평형", "고체, 액체, 기체 세 가지 상이 함께 존재하여 평형을 이루는 지점은?", "삼중점 (Triple Point)"],
-  ["묽은 용액", "용액의 끓는점 오름(\\(\\Delta T_b\\))을 구하는 공식은?", "\\(\\Delta T_b = K_b \\cdot m \\cdot i\\)"],
-  ["묽은 용액", "용액의 어는점 내림(\\(\\Delta T_f\\))을 구하는 공식은?", "\\(\\Delta T_f = K_f \\cdot m \\cdot i\\)"],
-  ["묽은 용액", "용액의 삼투압(\\(\\pi\\))을 구하는 반트 호프 공식은?", "\\(\\pi = CRT\\)"]
+  ["기체 법칙", "보일의 법칙 관계식", "\\(V \\propto \\frac{1}{P}\\)"],
+  ["기체 법칙", "보일의 법칙 일정 조건", "온도(T), 몰수(n) 일정"],
+  ["기체 법칙", "샤를의 법칙 비례식", "\\(V \\propto T\\)"],
+  ["기체 법칙", "샤를의 법칙 일정 조건", "압력(P), 몰수(n) 일정"],
+  ["기체 법칙", "샤를의 법칙 섭씨온도 공식", "\\(V_t = V_0 + \\frac{V_0}{273}t\\)"],
+  ["기체 법칙", "아보가드로 법칙 관계식", "\\(V \\propto n\\)"],
+  ["기체 법칙", "아보가드로 법칙 일정 조건", "온도(T), 압력(P) 일정"],
+  ["기체 법칙", "이상기체방정식 기본형", "\\(PV = nRT\\)"],
+  ["기체 법칙", "질량(w)과 분자량(M)을 포함한 이상기체방정식", "\\(PV = \\frac{w}{M}RT\\)"],
+  ["기체 법칙", "이상기체방정식으로 분자량(M)을 구하는 식", "\\(M = \\frac{wRT}{PV}\\)"],
+  ["액체·상평형", "온도 증가에 따른 증기압 변화", "온도가 높아질수록 증기압 증가"],
+  ["액체·상평형", "분자 간 인력과 증기압의 관계", "분자 간 인력이 작을수록 증기압이 큼"],
+  ["액체·상평형", "상평형 그림에서 삼중점의 의미", "고체, 액체, 기체 세 상이 공존하는 상태"],
+  ["액체·상평형", "물의 융해 곡선 기울기 특성", "음(-)의 기울기 (압력 증가 시 어는점 낮아짐)"],
+  ["분자 결정", "구성 입자", "분자"],
+  ["분자 결정", "입자 간 인력", "분자 간 힘 (분산력, 쌍극자-쌍극자 힘, 수소 결합)"],
+  ["분자 결정", "전기전도성", "고체: 없음 / 액체: 없음"],
+  ["분자 결정", "녹는점 높낮이", "상대적으로 낮음"],
+  ["분자 결정", "대표 예시 2가지", "얼음, 드라이아이스"],
+  ["공유 결정", "구성 입자", "원자"],
+  ["공유 결정", "입자 간 인력", "공유 결합"],
+  ["공유 결정", "전기전도성", "고체: 없음 (단, 흑연은 예외로 있음) / 액체: 없음"],
+  ["공유 결정", "녹는점 높낮이", "매우 높음"],
+  ["공유 결정", "대표 예시 2가지", "다이아몬드, 석영(SiO₂)"],
+  ["이온 결정", "구성 입자", "양이온과 음이온"],
+  ["이온 결정", "입자 간 인력", "정전기적 인력 (이온 결합)"],
+  ["이온 결정", "전기전도성", "고체: 없음 / 액체 및 수용액: 있음"],
+  ["이온 결정", "녹는점 높낮이", "비교적 높음"],
+  ["이온 결정", "대표 예시 2가지", "염화 나트륨(NaCl), 탄산 칼슘(CaCO₃)"],
+  ["금속 결정", "구성 입자", "금속 양이온과 자유 전자"],
+  ["금속 결정", "입자 간 인력", "금속 결합"],
+  ["금속 결정", "전기전도성", "고체: 있음 / 액체: 있음"],
+  ["금속 결정", "기계적 특성", "연성(뽑힘성)과 전성(펴짐성)이 우수함"],
+  ["금속 결정", "대표 예시 2가지", "철(Fe), 구리(Cu)"],
+  ["물의 특성", "수소 결합에 의해 물의 끓는점/어는점이 갖는 특징", "분자량에 비해 끓는점과 어는점이 매우 높음"],
+  ["물의 특성", "수소 결합에 의해 물의 비열과 표면장력이 갖는 특징", "다른 액체에 비해 비열과 표면장력이 매우 큼"],
+  ["물의 특성", "물 결빙 시 부피와 밀도의 변화", "부피 증가, 밀도 감소 (얼음이 물에 뜸)"],
+  ["물리적 현상", "비열의 정의", "물질 1 g의 온도를 1 ℃ 올리는 데 필요한 열량"],
+  ["물리적 현상", "표면장력의 정의", "액체 표면적을 최소화하려는 힘"],
+  ["모세관 현상", "물에서의 부착력 vs 응집력 크기 비교 및 모양", "부착력 > 응집력 (오목함, 관을 따라 상승)"],
+  ["모세관 현상", "수은에서의 부착력 vs 응집력 크기 비교 및 모양", "응집력 > 부착력 (볼록함, 관을 따라 하강)"],
+  ["묽은 용액", "증기압 내림의 정의", "비휘발성 용질을 녹일 때 용매의 몰분율 감소로 증기압이 낮아지는 현상"],
+  ["묽은 용액", "끓는점 오름 공식", "\\(\\Delta T_b = K_b \\cdot m \\cdot i\\)"],
+  ["묽은 용액", "어는점 내림 공식", "\\(\\Delta T_f = K_f \\cdot m \\cdot i\\)"],
+  ["묽은 용액", "삼투압 공식 (반트호프 법칙)", "\\(\\pi = CRT\\) (또는 \\(\\pi = iCRT\\))"],
+  ["농도", "몰농도(M) 정의 및 공식", "\\(\\text{몰농도}(M) = \\frac{\\text{용질의 몰수(mol)}}{\\text{용액의 부피(L)}}\\)"],
+  ["농도", "몰랄농도(m) 정의 및 공식", "\\(\\text{몰랄농도}(m) = \\frac{\\text{용질의 몰수(mol)}}{\\text{용매의 질량(kg)}}\\)"]
 ];
 
 const physicsSymbols = {
-  "θ":"경사각 / 각도","f":"마찰력 / 관성력","F_N":"수직 항력","a":"가속도",
-  "g":"중력가속도","h":"높이 / 변위","v_0":"초기 속도","T":"장력 / 주기",
-  "m_i":"관성 질량","m_g":"중력 질량","R_s":"슈바르츠실트 반지름","c":"빛의 속도",
-  "G":"만유인력 상수","ω":"각속도","r":"반지름 / 거리"
+  "v_x":"수평 방향 속도","v_y":"연직 방향 속도","R":"최대 수평 도달 거리","h":"낙하 높이",
+  "T":"장력(Tension)","N":"수직항력","θ":"경사각","μ_s":"정지 마찰계수","μ_k":"동마찰계수","F_k":"동마찰력",
+  "Q":"열량","k":"열전도율","A":"단면적","T₁":"고온","T₂":"저온","t":"시간","l":"길이",
+  "l₀":"처음 길이","Δl":"길이 변화량","α":"선팽창계수","ΔT":"온도 변화량","V":"부피","V₀":"처음 부피","β":"부피팽창계수",
+  "c":"비열","m":"질량","C":"열용량","L":"잠열","P":"압력","n":"몰수","R":"기체상수",
+  "v":"속도","v₀":"처음 속도","a":"가속도","s":"변위","g":"중력가속도","r":"반지름","ω":"각속도","F":"힘","G":"만유인력 상수","M":"천체 질량","E":"역학적 에너지"
 };
 
 const chemistrySymbols = {
-  "P":"압력","V":"부피","T":"절대온도(K)","n":"몰수(mol)","R":"기체상수",
-  "M":"분자량 / 몰농도","m":"몰랄농도","π":"삼투압","K_b":"끓는점 오름 상수","K_f":"어는점 내림 상수"
+  "P":"압력","V":"부피","T":"절대온도(K)","t":"섭씨온도(℃)","n":"몰수(mol)",
+  "R":"기체상수","w":"질량(g)","M":"분자량 / 몰농도","m":"몰랄농도",
+  "π":"삼투압","C":"몰농도","i":"반트호프 계수","K_b":"끓는점 오름 상수","K_f":"어는점 내림 상수"
 };
 
 const subjects = {
@@ -175,32 +258,21 @@ const subjects = {
 };
 
 let currentSubject = "물리";
-let currentUnit = "ALL";
 let deck = [], idx = 0, flipped = false, correct = 0, answered = 0;
 
-const selectSubEl = document.getElementById("subjectSelect");
-const selectUnitEl = document.getElementById("unitSelect");
+const selectEl = document.getElementById("subjectSelect");
 const tabsEl = document.getElementById("tabs");
-const imgEl = document.getElementById("cardImg");
 
-// 과목 선택 드롭다운 설정
 Object.keys(subjects).forEach(sub => {
   let opt = document.createElement("option");
   opt.value = sub;
   opt.textContent = sub;
-  selectSubEl.appendChild(opt);
+  selectEl.appendChild(opt);
 });
 
-selectSubEl.onchange = (e) => {
+selectEl.onchange = (e) => {
   currentSubject = e.target.value;
-  currentUnit = "ALL";
   buildTabs();
-  buildUnitSelect();
-  reset();
-};
-
-selectUnitEl.onchange = (e) => {
-  currentUnit = e.target.value;
   reset();
 };
 
@@ -212,42 +284,16 @@ function buildTabs(){
     btn.className = sub === currentSubject ? "on" : "";
     btn.onclick = () => {
       currentSubject = sub;
-      currentUnit = "ALL";
-      selectSubEl.value = sub;
+      selectEl.value = sub;
       buildTabs();
-      buildUnitSelect();
       reset();
     };
     tabsEl.appendChild(btn);
   });
 }
 
-function buildUnitSelect(){
-  selectUnitEl.innerHTML = "";
-  
-  let allOpt = document.createElement("option");
-  allOpt.value = "ALL";
-  allOpt.textContent = "전체 단원 모드";
-  selectUnitEl.appendChild(allOpt);
-
-  const units = [...new Set(subjects[currentSubject].data.map(item => item[0]))];
-  units.forEach(unit => {
-    let opt = document.createElement("option");
-    opt.value = unit;
-    opt.textContent = unit;
-    selectUnitEl.appendChild(opt);
-  });
-
-  selectUnitEl.value = currentUnit;
-}
-
 function reset(){
-  let sourceData = subjects[currentSubject].data;
-  if(currentUnit !== "ALL"){
-    sourceData = sourceData.filter(item => item[0] === currentUnit);
-  }
-
-  deck = JSON.parse(JSON.stringify(sourceData));
+  deck = JSON.parse(JSON.stringify(subjects[currentSubject].data));
   shuffle(deck);
   idx = 0;
   flipped = false;
@@ -270,27 +316,12 @@ function shuffle(a){
 }
 
 function render(){
-  if(!deck.length) {
-    document.getElementById("content").innerHTML = "<div>해당 단원에 문제가 없습니다.</div>";
-    document.getElementById("badge").textContent = "";
-    document.getElementById("score").textContent = "정답 0 / 0";
-    imgEl.style.display = "none";
-    return;
-  }
+  if(!deck.length) return;
+  let [unit, topic, answer] = deck[idx];
+  document.getElementById("badge").textContent = currentSubject + " · " + (idx + 1) + "/" + deck.length;
   
-  let [unit, topic, answer, imgSrc] = deck[idx];
-  document.getElementById("badge").textContent = currentSubject + " (" + (currentUnit === "ALL" ? "전체" : currentUnit) + ") · " + (idx + 1) + "/" + deck.length;
-  
-  // 이미지가 유효하게 있는 경우에만 표시
-  if(imgSrc && imgSrc.trim() !== ""){
-    imgEl.src = imgSrc;
-    imgEl.style.display = "block";
-  } else {
-    imgEl.style.display = "none";
-    imgEl.removeAttribute("src");
-  }
-
   let question = `<span class="unit-tag">[${unit}]</span>${topic}`;
+  
   const contentEl = document.getElementById("content");
   contentEl.innerHTML = flipped ? `<div class="a">${answer}</div>` : `<div class="q">${question}</div>`;
   document.getElementById("score").textContent = `정답 ${correct} / ${answered}`;
@@ -301,27 +332,23 @@ function render(){
 }
 
 function flip(){
-  if(!deck.length) return;
   flipped = !flipped;
   render();
 }
 
 function next(){
-  if(!deck.length) return;
   idx = (idx + 1) % deck.length;
   flipped = false;
   render();
 }
 
 function known(){
-  if(!deck.length) return;
   answered++;
   correct++;
   next();
 }
 
 function hold(){
-  if(!deck.length) return;
   answered++;
   let current = deck[idx];
   deck.splice(idx, 1);
@@ -333,347 +360,6 @@ function hold(){
 
 // 초기화
 buildTabs();
-buildUnitSelect();
-reset();
-</script>
-</body>
-</html>
-<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>공식암기도우미 by 서정원</title>
-
-<!-- MathJax 설정 및 스크립트 로드 -->
-<script>
-window.MathJax = {
-  tex: {
-    inlineMath: [['\\(', '\\)'], ['$', '$']]
-  },
-  svg: {
-    fontCache: 'global'
-  },
-  startup: {
-    pageReady: () => {
-      return MathJax.startup.defaultPageReady().then(() => {
-        if (typeof render === 'function') {
-          render();
-        }
-      });
-    }
-  }
-};
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-
-<style>
-*{box-sizing:border-box} 
-body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:#f4f6fb;color:#182033}
-.wrap{max-width:760px;margin:auto;padding:18px}
-h1{font-size:26px;margin:8px 0}
-.sub{color:#687086;margin-bottom:16px}
-.panel{background:white;border-radius:18px;padding:16px;box-shadow:0 5px 20px #0000000d;margin-bottom:14px}
-.select-group{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-select,button{font:inherit;border:0;border-radius:12px;padding:12px 14px;cursor:pointer}
-select{width:100%;background:#eef1f7}
-.tabs{display:flex;gap:8px;overflow-x:auto;margin:12px 0;padding-bottom:4px}
-.tabs button{white-space:nowrap;background:#eef1f7;flex:1}
-.tabs button.on{background:#182033;color:white}
-.card{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;border:2px solid #e6e9f0;border-radius:18px;padding:28px 20px;position:relative}
-.badge{position:absolute;top:14px;left:14px;font-size:13px;color:#667085}
-.card-img{max-width:100%;max-height:180px;border-radius:8px;margin-bottom:12px;object-fit:contain;display:none}
-.q{font-size:20px;font-weight:750;line-height:1.5}
-.a{font-size:22px;font-weight:800;line-height:1.5;color:#1d2939}
-.unit-tag{color:#3b82f6;font-weight:800;margin-right:6px}
-.hint{color:#7b8498;font-size:13px;margin-top:10px;text-align:center}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.actions button{font-weight:700}
-.wrong{background:#ffe7e7}
-.right{background:#e3f7eb}
-.row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-.score{font-weight:750}
-.small{font-size:13px;color:#70798d}
-.symbol-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:8px;margin-top:10px}
-@media(max-width:500px){.select-group{grid-template-columns:1fr}.q{font-size:17px}.a{font-size:19px}.card{min-height:320px}}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <h1>공식암기도우미 by 서정원</h1>
-  <div class="sub">물리 및 화학 주요 공식 카드</div>
-
-  <div class="panel">
-    <div class="select-group">
-      <select id="subjectSelect"></select>
-      <select id="unitSelect"></select>
-    </div>
-    <div class="tabs" id="tabs"></div>
-  </div>
-
-  <div class="panel">
-    <div class="card" id="card" onclick="flip()">
-      <div class="badge" id="badge"></div>
-      <img id="cardImg" class="card-img" alt="문제 상황 이미지" onerror="this.style.display='none'">
-      <div id="content"></div>
-    </div>
-    <div class="hint">카드를 클릭하면 정답이 보입니다.</div>
-    <div class="actions">
-      <button class="right" onclick="known()">아는거다</button>
-      <button class="wrong" onclick="hold()">몰랐다</button>
-    </div>
-    <div class="row">
-      <span class="score" id="score">정답 0 / 0</span>
-      <span class="small"></span>
-    </div>
-  </div>
-
-  <div class="panel small">
-    <b>주요 기호 정리</b>
-    <div id="symbols" class="symbol-grid"></div>
-  </div>
-</div>
-
-<script>
-// 데이터 구조: [단원, 질문 문장, 정답 문장, 이미지경로(선택)]
-const physicsData = [
-  // 1. 빗면에서의 운동
-  ["빗면 운동", "마찰이 없는 빗면에 놓인 물체에 작용하는 중력 성분 중 수직 항력과 평형을 이루는 힘은?", "\\(mg\\cos\\theta\\) (중력의 y성분)"],
-  ["빗면 운동", "마찰이 없는 빗면 위의 물체에 작용하는 알짜힘과 이 물체의 운동 형태는?", "알짜힘: \\(mg\\sin\\theta\\)<br>운동: 등가속도 운동"],
-  ["빗면 운동", "마찰을 무시할 수 있는 빗면을 미끄러져 내려가는 물체의 가속도 공식은?", "\\(a = g\\sin\\theta\\)"],
-  ["빗면 운동", "마찰이 존재하는 빗면 위의 물체에 작용하는 3가지 힘은?", "중력, 수직 항력, 마찰력"],
-  ["빗면 운동", "마찰이 있는 빗면에서 운동하는 물체의 알짜힘 식은?", "\\(mg\\sin\\theta - f\\)"],
-  ["빗면 운동", "마찰이 있는 빗면에서 \\(mg\\sin\\theta > f\\) 조건일 때 물체의 운동 상태는?", "등가속도 운동"],
-  ["빗면 운동", "마찰이 있는 빗면에서 \\(mg\\sin\\theta = f\\) 조건일 때 물체의 운동 상태는?", "정지 상태 유지 또는 등속도 운동"],
-  ["빗면 운동", "마찰이 존재하는 빗면을 따라 내려가는 물체의 가속도 공식은?", "\\(a = \\frac{mg\\sin\\theta - f}{m}\\)"],
-
-  // 2. 연결된 물체의 운동
-  ["연결된 물체", "수평 탁자 위의 물체 A와 실로 연결되어 매달린 B가 함께 움직일 때 가속도는?", "\\(a = \\frac{m_B}{m_A + m_B}g\\)"],
-  ["연결된 물체", "수평 탁자 위 A와 매달린 B가 연결된 계에서 물체 A에 작용하는 알짜힘은?", "\\(F_A = \\frac{m_A m_B}{m_A + m_B}g\\)"],
-  ["연결된 물체", "수평 탁자 위 A와 매달린 B가 연결된 계에서 물체 B에 작용하는 알짜힘은?", "\\(F_B = \\frac{m_B^2}{m_A + m_B}g\\)"],
-  ["연결된 물체", "도르래에 연결된 두 물체 A, B(\\(m_B > m_A\\))에 작용하는 전체 알짜힘의 크기는?", "\\((m_B - m_A)g\\)"],
-  ["연결된 물체", "도르래에 매달려 함께 운동하는 두 물체 A, B(\\(m_B > m_A\\))의 가속도는?", "\\(a = \\frac{m_B - m_A}{m_A + m_B}g\\)"],
-  ["연결된 물체", "빗면의 물체 A와 도르래로 매달린 물체 B가 연결된 계의 가속도 공식은?", "\\(a = \\frac{m_B - m_A\\sin\\theta}{m_A + m_B}g\\)"],
-
-  // 3. 자유 낙하 및 연직 상방 운동
-  ["낙하/상방", "자유 낙하하는 물체에 작용하는 알짜힘과 가속도는? (아래쪽을 +로 설정)", "알짜힘: \\(mg\\), 가속도: \\(g\\)"],
-  ["낙하/상방", "자유 낙하 운동 시 시간에 따른 속력(\\(v\\))과 낙하 거리(\\(-h\\)) 공식은?", "\\(v = gt\\), \\(h = \\frac{1}{2}gt^2\\)"],
-  ["낙하/상방", "자유 낙하 운동의 위치-시간 그래프에서 위치 변화와 시간의 비례 관계는?", "위치는 [ 시간의 제곱(\\(t^2\\)) ]에 비례하여 증가합니다."],
-  ["낙하/상방", "연직 위로 던진 물체에 작용하는 알짜힘과 가속도는? (위쪽을 +로 설정)", "알짜힘: \\(-mg\\), 가속도: \\(-g\\)"],
-  ["낙하/상방", "연직 위로 던진 물체의 속도(\\(-v\\))와 높이(\\(-h\\)) 공식은?", "\\(v = v_0 - gt\\), \\(h = v_0 t - \\frac{1}{2}gt^2\\)"],
-  ["낙하/상방", "연직 위로 던진 물체의 속력과 높이 사이의 관계식은?", "\\(v^2 - v_0^2 = -2gh\\)"],
-  ["낙하/상방", "연직 위로 던져진 물체가 최고점에 도달했을 때 순간 속도는?", "\\(v = 0\\)"],
-
-  // 4. 진자 운동 및 경사진 곡선 도로
-  ["진자 운동", "진자 운동의 정의와 운동하는 추에 작용하는 두 가지 힘은?", "줄에 매달린 추가 왕복하는 운동이며, [ 중력(mg) ]과 [ 실의 장력(T) ]이 작용합니다."],
-  ["진자 운동", "진자 운동에서 장력이 최소가 되는 위치와 이때 알짜힘의 크기는?", "최고점(A, E)에서 장력이 최소가 되며, 알짜힘은 [ 최대 ]입니다."],
-  ["진자 운동", "진자 운동에서 장력이 최대가 되는 위치와 이때 알짜힘의 크기는?", "최저점(C)에서 장력이 최대가 되며, 알짜힘은 [ 최소(0) ]입니다."],
-  ["곡선 도로", "경사각 \\(\\theta\\)인 곡선 도로를 도는 자동차의 구심력 방정식은?", "\\(F_N \\sin\\theta = \\frac{mv^2}{r} = mg\\tan\\theta\\)"],
-  ["곡선 도로", "마찰이 없는 경사 도로에서 자동차가 미끄러지지 않고 돌 수 있는 안전 속력은?", "\\(v = \\sqrt{gr\\tan\\theta}\\)"],
-
-  // 5. 좌표계 및 관성력
-  ["좌표계", "3차원 공간에서 위치를 나타내기 위해 주로 사용되는 3가지 좌표계는?", "직교좌표계(x, y, z), 극좌표계(r, θ, ϕ), 원통좌표계(r, ϕ, z)"],
-  ["관성력", "가속도 \\(a\\)로 운동하는 가속 좌표계 내에서 관찰되는 관성력 공식은?", "\\(\\vec{f} = -m\\vec{a}\\) (가속도와 반대 방향)"],
-  ["관성력 예시", "가속도 \\(a\\)로 위쪽으로 가속 승강하는 엘리베이터 안에서의 체감 무게는?", "\\(w = m(g + a)\\)"],
-  ["관성력 예시", "가속도 \\(a\\)로 아래쪽으로 가속 하강하는 엘리베이터 안에서의 체감 무게는?", "\\(w = m(g - a)\\)"],
-  ["관성력 예시", "줄이 끊어져 자유 낙하하는 엘리베이터 내부의 관찰자가 느끼는 체감 무게는?", "무중력 상태 (체감 무게 \\(w = 0\\))"],
-  ["전향력", "지구 자전에 의해 북반구에서 이동하는 물체가 받는 코리올리 힘의 방향은?", "진행 방향의 [ 오른쪽 ] 방향"],
-
-  // 6. 상대성이론 및 블랙홀
-  ["질량/상대성", "운동 가속도로 구하는 관성 질량과 중력장 크기로 구하는 중력 질량의 관계는?", "아인슈타인의 등가원리에 의해 관성 질량과 중력 질량은 동일합니다."],
-  ["상대성이론", "아인슈타인의 등가원리 핵심 개념은?", "가속 운동 좌표계 내에서의 현상과 중력장 내에서의 현상은 서로 구분할 수 없다."],
-  ["블랙홀", "블랙홀의 경계면으로 빛조차 탈출할 수 없는 한계 영역을 무엇이라 하는가?", "사건의 지평선(Event Horizon)"],
-  ["슈바르츠실트", "질량 M인 천체의 슈바르츠실트 반지름(\\(R_s\\)) 공식은?", "\\(R_s = \\frac{2GM}{c^2}\\)"]
-];
-
-const chemistryData = [
-  ["기체 법칙", "온도가 일정할 때 기체 부피와 압력의 관계식(보일의 법칙)은?", "\\(V \\propto \\frac{1}{P}\\)"],
-  ["기체 법칙", "압력이 일정할 때 기체 부피와 절대온도의 관계식(샤를의 법칙)은?", "\\(V \\propto T\\)"],
-  ["기체 법칙", "이상기체 상태 방정식의 기본 공식은?", "\\(PV = nRT\\)"],
-  ["기체 법칙", "이상기체 상태 방정식을 변형하여 분자량(M)을 구하는 공식은?", "\\(M = \\frac{wRT}{PV}\\)"],
-  ["액체·상평형", "고체, 액체, 기체 세 가지 상이 함께 존재하여 평형을 이루는 지점은?", "삼중점 (Triple Point)"],
-  ["묽은 용액", "용액의 끓는점 오름(\\(\\Delta T_b\\))을 구하는 공식은?", "\\(\\Delta T_b = K_b \\cdot m \\cdot i\\)"],
-  ["묽은 용액", "용액의 어는점 내림(\\(\\Delta T_f\\))을 구하는 공식은?", "\\(\\Delta T_f = K_f \\cdot m \\cdot i\\)"],
-  ["묽은 용액", "용액의 삼투압(\\(\\pi\\))을 구하는 반트 호프 공식은?", "\\(\\pi = CRT\\)"]
-];
-
-const physicsSymbols = {
-  "θ":"경사각 / 각도","f":"마찰력 / 관성력","F_N":"수직 항력","a":"가속도",
-  "g":"중력가속도","h":"높이 / 변위","v_0":"초기 속도","T":"장력 / 주기",
-  "m_i":"관성 질량","m_g":"중력 질량","R_s":"슈바르츠실트 반지름","c":"빛의 속도",
-  "G":"만유인력 상수","ω":"각속도","r":"반지름 / 거리"
-};
-
-const chemistrySymbols = {
-  "P":"압력","V":"부피","T":"절대온도(K)","n":"몰수(mol)","R":"기체상수",
-  "M":"분자량 / 몰농도","m":"몰랄농도","π":"삼투압","K_b":"끓는점 오름 상수","K_f":"어는점 내림 상수"
-};
-
-const subjects = {
-  "물리": { data: physicsData, symbols: physicsSymbols },
-  "화학": { data: chemistryData, symbols: chemistrySymbols }
-};
-
-let currentSubject = "물리";
-let currentUnit = "ALL";
-let deck = [], idx = 0, flipped = false, correct = 0, answered = 0;
-
-const selectSubEl = document.getElementById("subjectSelect");
-const selectUnitEl = document.getElementById("unitSelect");
-const tabsEl = document.getElementById("tabs");
-const imgEl = document.getElementById("cardImg");
-
-// 과목 선택 드롭다운 설정
-Object.keys(subjects).forEach(sub => {
-  let opt = document.createElement("option");
-  opt.value = sub;
-  opt.textContent = sub;
-  selectSubEl.appendChild(opt);
-});
-
-selectSubEl.onchange = (e) => {
-  currentSubject = e.target.value;
-  currentUnit = "ALL";
-  buildTabs();
-  buildUnitSelect();
-  reset();
-};
-
-selectUnitEl.onchange = (e) => {
-  currentUnit = e.target.value;
-  reset();
-};
-
-function buildTabs(){
-  tabsEl.innerHTML = "";
-  Object.keys(subjects).forEach(sub => {
-    let btn = document.createElement("button");
-    btn.textContent = sub;
-    btn.className = sub === currentSubject ? "on" : "";
-    btn.onclick = () => {
-      currentSubject = sub;
-      currentUnit = "ALL";
-      selectSubEl.value = sub;
-      buildTabs();
-      buildUnitSelect();
-      reset();
-    };
-    tabsEl.appendChild(btn);
-  });
-}
-
-function buildUnitSelect(){
-  selectUnitEl.innerHTML = "";
-  
-  let allOpt = document.createElement("option");
-  allOpt.value = "ALL";
-  allOpt.textContent = "전체 단원 모드";
-  selectUnitEl.appendChild(allOpt);
-
-  const units = [...new Set(subjects[currentSubject].data.map(item => item[0]))];
-  units.forEach(unit => {
-    let opt = document.createElement("option");
-    opt.value = unit;
-    opt.textContent = unit;
-    selectUnitEl.appendChild(opt);
-  });
-
-  selectUnitEl.value = currentUnit;
-}
-
-function reset(){
-  let sourceData = subjects[currentSubject].data;
-  if(currentUnit !== "ALL"){
-    sourceData = sourceData.filter(item => item[0] === currentUnit);
-  }
-
-  deck = JSON.parse(JSON.stringify(sourceData));
-  shuffle(deck);
-  idx = 0;
-  flipped = false;
-  correct = 0;
-  answered = 0;
-  
-  const syms = subjects[currentSubject].symbols;
-  document.getElementById("symbols").innerHTML = Object.entries(syms)
-    .map(([k,v]) => `<div><b>${k}</b> : ${v}</div>`).join("");
-    
-  render();
-}
-
-function shuffle(a){
-  for(let i = a.length - 1; i > 0; i--){
-    let j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function render(){
-  if(!deck.length) {
-    document.getElementById("content").innerHTML = "<div>해당 단원에 문제가 없습니다.</div>";
-    document.getElementById("badge").textContent = "";
-    document.getElementById("score").textContent = "정답 0 / 0";
-    imgEl.style.display = "none";
-    return;
-  }
-  
-  let [unit, topic, answer, imgSrc] = deck[idx];
-  document.getElementById("badge").textContent = currentSubject + " (" + (currentUnit === "ALL" ? "전체" : currentUnit) + ") · " + (idx + 1) + "/" + deck.length;
-  
-  // 이미지가 유효하게 있는 경우에만 표시
-  if(imgSrc && imgSrc.trim() !== ""){
-    imgEl.src = imgSrc;
-    imgEl.style.display = "block";
-  } else {
-    imgEl.style.display = "none";
-    imgEl.removeAttribute("src");
-  }
-
-  let question = `<span class="unit-tag">[${unit}]</span>${topic}`;
-  const contentEl = document.getElementById("content");
-  contentEl.innerHTML = flipped ? `<div class="a">${answer}</div>` : `<div class="q">${question}</div>`;
-  document.getElementById("score").textContent = `정답 ${correct} / ${answered}`;
-  
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([contentEl]).catch((err) => console.log(err));
-  }
-}
-
-function flip(){
-  if(!deck.length) return;
-  flipped = !flipped;
-  render();
-}
-
-function next(){
-  if(!deck.length) return;
-  idx = (idx + 1) % deck.length;
-  flipped = false;
-  render();
-}
-
-function known(){
-  if(!deck.length) return;
-  answered++;
-  correct++;
-  next();
-}
-
-function hold(){
-  if(!deck.length) return;
-  answered++;
-  let current = deck[idx];
-  deck.splice(idx, 1);
-  deck.push(current);
-  if(idx >= deck.length) idx = 0;
-  flipped = false;
-  render();
-}
-
-// 초기화
-buildTabs();
-buildUnitSelect();
 reset();
 </script>
 </body>
