@@ -2,8 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>공식암기도우미 by 서정원</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>공식암기도우미 by 서정원 | 과학 공식 마스터</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
 
 <!-- MathJax 설정 및 스크립트 로드 -->
 <script>
@@ -29,67 +32,779 @@ window.MathJax = {
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
 <style>
-*{box-sizing:border-box} 
-body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:#f4f6fb;color:#182033}
-.wrap{max-width:760px;margin:auto;padding:18px}
-h1{font-size:26px;margin:8px 0}
-.sub{color:#687086;margin-bottom:16px}
-.panel{background:white;border-radius:18px;padding:16px;box-shadow:0 5px 20px #0000000d;margin-bottom:14px}
-select,button{font:inherit;border:0;border-radius:12px;padding:12px 14px;cursor:pointer}
-select{width:100%;background:#eef1f7}
-.tabs{display:flex;gap:8px;overflow-x:auto;margin:12px 0;padding-bottom:4px}
-.tabs button{white-space:nowrap;background:#eef1f7;flex:1}
-.tabs button.on{background:#182033;color:white}
-.card{min-height:270px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;border:2px solid #e6e9f0;border-radius:18px;padding:28px;position:relative}
-.badge{position:absolute;top:14px;left:14px;font-size:13px;color:#667085}
-.q{font-size:22px;font-weight:750;line-height:1.5}
-.a{font-size:25px;font-weight:800;line-height:1.5;color:#1d2939}
-.unit-tag{color:#3b82f6;font-weight:800;margin-right:6px}
-.hint{color:#7b8498;font-size:13px;margin-top:10px;text-align:center}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.actions button{font-weight:700}
-.wrong{background:#ffe7e7}
-.right{background:#e3f7eb}
-.row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-.score{font-weight:750}
-.small{font-size:13px;color:#70798d}
-.symbol-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:8px;margin-top:10px}
-@media(max-width:500px){.q{font-size:18px}.a{font-size:21px}.card{min-height:300px}}
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: #eef2ff;
+  --success: #10b981;
+  --success-bg: #ecfdf5;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --danger-bg: #fef2f2;
+  --bg-main: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 25px -4px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 35px -8px rgba(79, 70, 229, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 24px 16px 60px;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* Header & Profile bar */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.title-area h1 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title-area .sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.auth-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-auth {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-auth:hover {
+  background: var(--primary-light);
+  border-color: #c7d2fe;
+  color: var(--primary);
+}
+
+.btn-auth.primary {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.btn-auth.primary:hover {
+  background: var(--primary-hover);
+}
+
+/* User Level Bar Card */
+.user-status-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.user-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-name-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.tier-badge {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+}
+
+.exp-numbers {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.exp-numbers span {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.progress-track {
+  width: 100%;
+  height: 9px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6366f1, #38bdf8);
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Panels */
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Category Switcher Tabs */
+.category-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 5px;
+  border-radius: var(--radius-md);
+  margin-bottom: 4px;
+}
+
+.cat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cat-btn.active {
+  background: #ffffff;
+  color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.cat-text-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.25;
+}
+
+.cat-main {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cat-sub {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.cat-btn.active .cat-sub {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.cat-icon {
+  font-size: 20px;
+}
+
+/* Flashcard Container */
+.card-wrapper {
+  perspective: 1000px;
+  margin: 10px 0 14px;
+}
+
+.flashcard {
+  min-height: 290px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+  border: 2px solid #eef2f6;
+  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.06);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease, border-color 0.2s;
+  user-select: none;
+}
+
+.flashcard:hover {
+  border-color: #c7d2fe;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-badge {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6366f1;
+  background: var(--primary-light);
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-side-hint {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #f8fafc;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.unit-tag {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.card-text {
+  max-width: 90%;
+  word-break: keep-all;
+}
+
+.q-text {
+  font-size: 21px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.55;
+}
+
+.a-text {
+  font-size: 23px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.6;
+}
+
+.tap-hint {
+  text-align: center;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.act-btn {
+  padding: 15px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.act-btn:active {
+  transform: scale(0.98);
+}
+
+.act-btn.known {
+  background: var(--success-bg);
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.act-btn.known:hover {
+  background: #d1fae5;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.act-btn.unknown {
+  background: var(--danger-bg);
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.act-btn.unknown:hover {
+  background: #fee2e2;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.score-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.score-badge {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Symbol Dictionary Section */
+.symbol-header {
+  font-size: 15px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.symbol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.symbol-item {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.symbol-key {
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.symbol-val {
+  color: var(--text-muted);
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  max-width: 400px;
+  width: 100%;
+  padding: 26px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: modalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.modal-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.form-submit-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.form-submit-btn:hover {
+  background: var(--primary-hover);
+}
+
+.modal-switch {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 16px;
+}
+
+.modal-switch a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Floating EXP Animation & Toast */
+.floating-exp {
+  position: fixed;
+  font-weight: 800;
+  color: #10b981;
+  font-size: 20px;
+  pointer-events: none;
+  z-index: 2000;
+  animation: floatUp 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  text-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(0) scale(0.8); }
+  25% { opacity: 1; transform: translateY(-16px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-55px) scale(1); }
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #1e293b;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 2000;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+  body { padding: 16px 12px 40px; }
+  .flashcard { min-height: 270px; padding: 24px 16px; }
+  .q-text { font-size: 18px; }
+  .a-text { font-size: 20px; }
+  .symbol-grid { grid-template-columns: 1fr 1fr; }
+}
 </style>
 </head>
 <body>
+
 <div class="wrap">
-  <h1>공식암기도우미 by 서정원</h1>
-  <div class="sub">물리 및 화학 주요 공식 카드</div>
+  <!-- Header -->
+  <header>
+    <div class="title-area">
+      <h1>공식암기도우미 by 서정원</h1>
+      <div class="sub">수능 및 내신 대비 과학 공식 트레이닝</div>
+    </div>
+    <div class="auth-btn-group" id="authBtnGroup">
+      <!-- 동적으로 로그인/회원가입 or 로그아웃 렌더링 -->
+    </div>
+  </header>
 
-  <div class="panel">
-    <select id="subjectSelect"></select>
-    <div class="tabs" id="tabs"></div>
+  <!-- User Status & EXP Progress Card -->
+  <div class="user-status-card" id="userStatusCard">
+    <div class="user-status-header">
+      <div class="user-name-title">
+        <span id="displayUsername">게스트 학습자</span>
+        <span class="tier-badge" id="displayTier">Lv.1 초보 탐구자</span>
+      </div>
+      <div class="exp-numbers">
+        <span id="currentExp">0</span> / <span id="maxExp">50</span> EXP
+      </div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="expFill"></div>
+    </div>
   </div>
 
-  <div class="panel">
-    <div class="card" id="card" onclick="flip()">
-      <div class="badge" id="badge"></div>
-      <div id="content"></div>
-    </div>
-    <div class="hint">카드를 클릭하면 정답이 보입니다.</div>
-    <div class="actions">
-      <button class="right" onclick="known()">아는거다</button>
-      <button class="wrong" onclick="hold()">몰랐다</button>
-    </div>
-    <div class="row">
-      <span class="score" id="score">정답 0 / 0</span>
-      <span class="small"></span>
+  <!-- Category Selection Bar (4개 카테고리) -->
+  <div class="panel" style="padding: 12px; margin-bottom: 14px;">
+    <div class="category-bar">
+      <button class="cat-btn active" data-sub="역학과에너지(2학기 중간)" onclick="switchCategory('역학과에너지(2학기 중간)')">
+        <span class="cat-icon">⚡</span>
+        <span class="cat-text-group">
+          <span class="cat-main">역학과에너지</span>
+          <span class="cat-sub">2학기 중간</span>
+        </span>
+      </button>
+      <button class="cat-btn" data-sub="역학과에너지(2학기 기말)" onclick="switchCategory('역학과에너지(2학기 기말)')">
+        <span class="cat-icon">🎯</span>
+        <span class="cat-text-group">
+          <span class="cat-main">역학과에너지</span>
+          <span class="cat-sub">2학기 기말</span>
+        </span>
+      </button>
+      <button class="cat-btn" data-sub="물질과에너지(2학기 중간)" onclick="switchCategory('물질과에너지(2학기 중간)')">
+        <span class="cat-icon">🧪</span>
+        <span class="cat-text-group">
+          <span class="cat-main">물질과에너지</span>
+          <span class="cat-sub">2학기 중간</span>
+        </span>
+      </button>
+      <button class="cat-btn" data-sub="물질과에너지(2학기 기말)" onclick="switchCategory('물질과에너지(2학기 기말)')">
+        <span class="cat-icon">🔥</span>
+        <span class="cat-text-group">
+          <span class="cat-main">물질과에너지</span>
+          <span class="cat-sub">2학기 기말</span>
+        </span>
+      </button>
     </div>
   </div>
 
-  <div class="panel small">
-    <b>주요 기호 정리</b>
-    <div id="symbols" class="symbol-grid"></div>
+  <!-- Main Flashcard Board -->
+  <div class="panel">
+    <div class="card-wrapper">
+      <div class="flashcard" id="flashcard" onclick="flipCard(event)">
+        <div class="card-badge" id="cardBadge">역학과 에너지 · 1/45</div>
+        <div class="card-side-hint" id="cardSideHint">Q. 질문</div>
+        <div class="card-text" id="cardContent">
+          <!-- 카드 질문/답변 삽입 -->
+        </div>
+      </div>
+    </div>
+
+    <div class="tap-hint">💡 카드를 클릭하면 정답 수식을 확인할 수 있습니다.</div>
+
+    <div class="action-grid">
+      <button class="act-btn known" onclick="handleAnswer(true, event)">
+        <span>✨</span> 아는 공식이다! (+10 EXP)
+      </button>
+      <button class="act-btn unknown" onclick="handleAnswer(false, event)">
+        <span>🔄</span> 몰랐다 (뒤로 보내기)
+      </button>
+    </div>
+
+    <div class="score-stats">
+      <span>진행 점수: <b class="score-badge" id="scoreStat">0 / 0</b></span>
+      <span id="streakStat">🔥 0연속 정답</span>
+    </div>
+  </div>
+
+  <!-- Key Symbols Cheat Sheet -->
+  <div class="panel">
+    <div class="symbol-header">
+      <span>📌</span> <span id="symbolPanelTitle">역학과 에너지 주요 기호 정리</span>
+    </div>
+    <div class="symbol-grid" id="symbolList">
+      <!-- 기호 목록 -->
+    </div>
   </div>
 </div>
 
+<!-- Login / Sign-up Modal -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    
+    <!-- Login Form View -->
+    <div id="loginView">
+      <h2 class="modal-title">로그인</h2>
+      <p class="modal-desc">로그인하여 학습 진도와 EXP를 안전하게 보관하세요.</p>
+      <form onsubmit="handleLoginSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">아이디</label>
+          <input type="text" class="form-input" id="loginId" placeholder="아이디 입력" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">비밀번호</label>
+          <input type="password" class="form-input" id="loginPw" placeholder="비밀번호 입력" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="form-submit-btn">로그인</button>
+      </form>
+      <div class="modal-switch">
+        계정이 없으신가요? <a onclick="toggleModalMode('register')">회원가입하기</a>
+      </div>
+    </div>
+
+    <!-- Register Form View -->
+    <div id="registerView" style="display: none;">
+      <h2 class="modal-title">회원가입</h2>
+      <p class="modal-desc">가입 즉시 <b>+50 EXP</b> 보너스를 드립니다!</p>
+      <form onsubmit="handleRegisterSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">아이디</label>
+          <input type="text" class="form-input" id="regId" placeholder="영문/숫자 4자 이상" required minlength="3">
+        </div>
+        <div class="form-group">
+          <label class="form-label">닉네임</label>
+          <input type="text" class="form-input" id="regName" placeholder="표시될 이름" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">비밀번호</label>
+          <input type="password" class="form-input" id="regPw" placeholder="비밀번호" required minlength="4">
+        </div>
+        <button type="submit" class="form-submit-btn">가입 완료하고 +50 EXP 받기</button>
+      </form>
+      <div class="modal-switch">
+        이미 계정이 있으신가요? <a onclick="toggleModalMode('login')">로그인하기</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Feedback -->
+<div class="toast" id="toast"></div>
+
 <script>
+/* =========================================================================
+   1. 데이터 정의 (역학과 에너지 & 물질과 에너지)
+   ========================================================================= */
 const physicsData = [
   // 진자 운동
   ["진자 운동", "진자 추에 작용하는 힘의 종류 2가지", "중력(\\(mg\\)), 장력(\\(T\\))"],
@@ -190,7 +905,7 @@ const physicsData = [
   ["등속 원운동", "구심력 공식 (\\(v\\)와 \\(r\\) 이용)", "\\(F=\\frac{mv^2}{r}\\)"],
   ["등속 원운동", "구심력 공식 (\\(r\\)과 \\(\\omega\\) 이용)", "\\(F=mr\\omega^2\\)"],
   
-  // 탈출속도·인공위성
+  // 만유인력·인공위성
   ["만유인력·위성", "만유인력 공식", "\\(F=G\\frac{m_1m_2}{r^2}\\)"],
   ["만유인력·위성", "케플러 제3법칙(조화의 법칙) 공식", "\\(T^2=\\frac{4\\pi^2r^3}{GM}\\)"],
   ["만유인력·위성", "인공위성의 원궤도 속력 공식", "\\(v=\\sqrt{\\frac{GM}{r}}\\)"],
@@ -201,18 +916,14 @@ const physicsData = [
   ["운동량", "운동량 공식", "\\(p=mv\\)"],
   ["운동량", "질량 \\(m\\)인 물체가 속도 \\(v\\)로 운동할 때 운동량", "\\(p=mv\\)"],
   
-  // 열팽창·열전도
+  // 열역학
   ["열역학", "열전도에 의한 열량 공식", "\\(Q=\\frac{kA(T_1-T_2)t}{l}\\)"],
   ["열역학", "선팽창 공식", "\\(l=l_0(1+\\alpha\\Delta T)\\)"],
   ["열역학", "부피팽창 공식", "\\(V=V_0(1+\\beta\\Delta T)\\)"],
-  
-  // 열량·비열·잠열
   ["열량·비열", "비열 공식", "\\(c=\\frac{Q}{m\\Delta T}\\)"],
   ["열량·비열", "열량 공식", "\\(Q=cm\\Delta T\\)"],
   ["열량·비열", "열용량 공식", "\\(C=cm\\)"],
   ["열량·비열", "잠열 공식", "\\(L=\\frac{Q}{m}\\)"],
-  
-  // 이상기체
   ["이상기체", "이상기체방정식", "\\(PV=nRT\\)"]
 ];
 
@@ -269,11 +980,10 @@ const chemistryData = [
 const physicsSymbols = {
   "F_N":"수직항력","F_a":"관성력","r_s":"슈바르츠실트 반지름","c":"빛의 속도","G":"만유인력 상수",
   "v_x":"수평 방향 속도","v_y":"연직 방향 속도","R":"최대 수평 도달 거리","h":"낙하 높이",
-  "T":"장력(Tension) / 주기","N":"수직항력","θ":"경사각","μ_s":"정지 마찰계수","μ_k":"동마찰계수","F_k":"동마찰력",
-  "Q":"열량","k":"열전도율","A":"단면적","T₁":"고온","T₂":"저온","t":"시간","l / L":"길이 / 줄 길이",
-  "l₀":"처음 길이","Δl":"길이 변화량","α":"선팽창계수","ΔT":"온도 변화량","V":"부피","V₀":"처음 부피","β":"부피팽창계수",
-  "c":"비열","m":"질량","C":"열용량","L":"잠열","P":"압력","n":"몰수","R":"기체상수",
-  "v":"속도","v₀":"처음 속도","a":"가속도","s":"변위","g":"중력가속도","r":"반지름","ω":"각속도","F":"힘","M":"천체 질량","E":"역학적 에너지"
+  "T":"장력 / 주기","N":"수직항력","θ":"경사각","μ_s":"정지 마찰계수","μ_k":"동마찰계수","F_k":"동마찰력",
+  "Q":"열량","k":"열전도율","A":"단면적","T₁":"고온","T₂":"저온","t":"시간","l / L":"길이",
+  "α":"선팽창계수","β":"부피팽창계수","c":"비열","m":"질량","C":"열용량","L":"잠열",
+  "v":"속도","v₀":"처음 속도","a":"가속도","s":"변위","g":"중력가속도","r":"반지름","ω":"각속도","F":"힘"
 };
 
 const chemistrySymbols = {
@@ -282,115 +992,465 @@ const chemistrySymbols = {
   "π":"삼투압","C":"몰농도","i":"반트호프 계수","K_b":"끓는점 오름 상수","K_f":"어는점 내림 상수"
 };
 
+const physicsFinalData = [
+  // 일과 에너지
+  ["일과 에너지", "일(Work)의 기본 정의 공식 (힘 \\(F\\), 이동거리 \\(s\\), 각도 \\(\\theta\\))", "\\(W = Fs \\cos\\theta\\)"],
+  ["일과 에너지", "운동 에너지 공식 (질량 \\(m\\), 속력 \\(v\\))", "\\(E_k = \\frac{1}{2}mv^2\\)"],
+  ["일과 에너지", "중력 퍼텐셜(위치) 에너지 공식 (기준면으로부터 높이 \\(h\\))", "\\(E_p = mgh\\)"],
+  ["일과 에너지", "용수철 탄성력에 의한 퍼텐셜 에너지 (용수철 상수 \\(k\\), 변위 \\(x\\))", "\\(E_p = \\frac{1}{2}kx^2\\)"],
+  ["일과 에너지", "일-에너지 정리 (알짜힘이 한 일과 운동 에너지 변화)", "\\(W_{\\text{net}} = \\Delta E_k = \\frac{1}{2}mv^2 - \\frac{1}{2}mv_0^2\\)"],
+  ["일과 에너지", "역학적 에너지 보존 법칙 (보존력만 작용할 때)", "\\(E = E_k + E_p = \\text{일정}\\)"],
+  ["일과 에너지", "마찰력 등 비보존력이 한 일과 역학적 에너지의 관계", "\\(W_{\\text{비보존력}} = \\Delta E = E_{\\text{나중}} - E_{\\text{처음}}\\)"],
+  ["일과 에너지", "일률(Power) 공식 (일 \\(W\\), 시간 \\(t\\), 힘 \\(F\\), 속력 \\(v\\))", "\\(P = \\frac{W}{t} = Fv\\)"],
+
+  // 충격량과 운동량 보존
+  ["충격량", "충격량(Impulse)의 정의 공식 (힘 \\(F\\), 작용 시간 \\(\\Delta t\\))", "\\(I = F \\Delta t\\)"],
+  ["충격량", "충격량과 운동량 변화량의 관계식", "\\(I = \\Delta p = mv - mv_0\\)"],
+  ["충격량", "충돌 시 물체가 받는 평균 충격력(힘) 공식", "\\(F = \\frac{\\Delta p}{\\Delta t} = \\frac{m\\Delta v}{\\Delta t}\\)"],
+  ["충격량", "운동량 보존 법칙 (두 물체 1차원 충돌)", "\\(m_1v_1 + m_2v_2 = m_1v_1' + m_2v_2'\\)"],
+  ["충격량", "반발 계수(\\(\\text{e}\\)) 정의 공식", "\\(e = -\\frac{v_1' - v_2'}{v_1 - v_2} = \\frac{|v_1' - v_2'|}{|v_1 - v_2|}\\)"],
+  ["충격량", "완전 탄성 충돌의 반발 계수 값과 역학적 에너지 보존 여부", "\\(e = 1\\), 운동 에너지와 역학적 에너지 보존"],
+  ["충격량", "완전 비탄성 충돌(충돌 후 합체) 시 반발 계수 및 나중 속도", "\\(e = 0\\), \\(v' = \\frac{m_1v_1 + m_2v_2}{m_1 + m_2}\\)"],
+
+  // 특수 상대성 이론
+  ["특수 상대성", "특수 상대성 이론의 2가지 기본 가정", "1. 상대성 원리, 2. 광속 불변 원리"],
+  ["특수 상대성", "로런츠 인자(\\(\\gamma\\)) 공식", "\\(\\gamma = \\frac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}\\)"],
+  ["특수 상대성", "시간 지연(시간 팽창) 공식 (고유 시간 \\(\\Delta t_0\\))", "\\(\\Delta t = \\gamma \\Delta t_0 = \\frac{\\Delta t_0}{\\sqrt{1 - \\frac{v^2}{c^2}}}\\)"],
+  ["특수 상대성", "길이 수축 공식 (고유 길이 \\(L_0\\))", "\\(L = \\frac{L_0}{\\gamma} = L_0 \\sqrt{1 - \\frac{v^2}{c^2}}\\)"],
+  ["특수 상대성", "질량-에너지 동등성 기본 공식", "\\(E = mc^2\\)"],
+  ["특수 상대성", "정지 질량 \\(m_0\\)인 물체의 정지 에너지", "\\(E_0 = m_0 c^2\\)"],
+  ["특수 상대성", "핵반응(핵분열·핵융합) 시 방출되는 결손 질량 에너지 공식", "\\(\\Delta E = \\Delta m \\cdot c^2\\)"],
+
+  // 열역학 법칙 & 열효율
+  ["열역학 법칙", "기체가 팽창할 때 외부로 한 일 공식 (압력 \\(P\\), 부피변화 \\(\\Delta V\\))", "\\(W = P\\Delta V\\)"],
+  ["열역학 법칙", "열역학 제1법칙 (기체에 공급한 열량 \\(Q\\), 내부에너지변화 \\(\\Delta U\\), 일 \\(W\\))", "\\(Q = \\Delta U + W\\)"],
+  ["열역학 법칙", "단원자 분자 이상기체의 내부 에너지 공식", "\\(U = \\frac{3}{2}nRT\\)"],
+  ["열역학 법칙", "등적(부피 일정) 변화에서의 열역학 제1법칙", "\\(W = 0 \\implies Q = \\Delta U\\)"],
+  ["열역학 법칙", "등온(온도 일정) 변화에서의 열역학 제1법칙", "\\(\\Delta U = 0 \\implies Q = W\\)"],
+  ["열역학 법칙", "단열(\\(\\text{Q}=0\\)) 팽창 시 기체의 온도와 내부 에너지 변화", "\\(Q = 0 \\implies \\Delta U = -W\\) (온도 하강, 내부 에너지 감소)"],
+  ["열역학 법칙", "열기관의 열효율(\\(\\text{e}\\)) 공식 (흡수열 \\(Q_1\\), 방출열 \\(Q_2\\), 일 \\(W\\))", "\\(e = \\frac{W}{Q_1} = 1 - \\frac{Q_2}{Q_1}\\)"],
+  ["열역학 법칙", "이상적인 카르노 기관의 열효율 공식 (고온 \\(T_1\\), 저온 \\(T_2\\))", "\\(e_c = 1 - \\frac{T_2}{T_1}\\)"],
+
+  // 전자기 유도 & 송전
+  ["전자기 유도", "패러데이 전자기 유도 법칙 (유도기전력 \\(V\\), 코일 감은수 \\(N\\), 자속 \\(\\Phi\\))", "\\(V = -N \\frac{\\Delta \\Phi}{\\Delta t}\\)"],
+  ["전자기 유도", "자기선속(자속 \\(\\Phi\\))의 정의식 (자기장 \\(B\\), 단면적 \\(A\\))", "\\(\\Phi = BA \\cos\\theta\\)"],
+  ["전자기 유도", "변압기 1차/2차 코일 전압비와 감은 수 비의 관계", "\\(\\frac{V_1}{V_2} = \\frac{N_1}{N_2}\\)"],
+  ["전자기 유도", "송전선에서 손실되는 전력 공식 (송전 전류 \\(I\\), 저항 \\(R\\), 송전 전압 \\(V\\))", "\\(P_{\\text{손실}} = I^2 R = \\left(\\frac{P_0}{V}\\right)^2 R\\)"]
+];
+
+const chemistryFinalData = [
+  // 화학 반응과 열 (엔탈피)
+  ["화학 반응과 열", "반응 엔탈피(\\(\\Delta H\\))의 기본 정의식", "\\(\\Delta H = H_{\\text{생성물}} - H_{\\text{반응물}}\\)"],
+  ["화학 반응과 열", "발열 반응의 \\(\\Delta H\\) 부호와 주변 온도 변화", "\\(\\Delta H < 0\\) (열 방출, 주위 온도 상승)"],
+  ["화학 반응과 열", "흡열 반응의 \\(\\Delta H\\) 부호와 주변 온도 변화", "\\(\\Delta H > 0\\) (열 흡수, 주위 온도 하강)"],
+  ["화학 반응과 열", "결합 에너지를 이용한 반응 엔탈피(\\(\\Delta H\\)) 산출 공식", "\\(\\Delta H = \\sum(\\text{반응물 결합 에너지}) - \\sum(\\text{생성물 결합 에너지})\\)"],
+  ["화학 반응과 열", "표준 생성 엔탈피(\\(\\Delta H_f^\\circ\\))를 이용한 반응 엔탈피 공식", "\\(\\Delta H^\\circ = \\sum \\Delta H_f^\\circ(\\text{생성물}) - \\sum \\Delta H_f^\\circ(\\text{반응물})\\)"],
+  ["화학 반응과 열", "헤스의 법칙(총열량 불변의 법칙)의 핵심 내용", "반응 경로에 관계없이 처음 상태와 최종 상태가 같으면 총 엔탈피 변화는 일정하다"],
+
+  // 반응 속도
+  ["반응 속도", "반응 속도(\\(\\text{v}\\))의 일반 정의식 (\\(aA \\to bB\\))", "\\(v = -\\frac{1}{a}\\frac{\\Delta [A]}{\\Delta t} = \\frac{1}{b}\\frac{\\Delta [B]}{\\Delta t}\\)"],
+  ["반응 속도", "반응 속도식(속도 법칙)의 기본 형태", "\\(v = k[A]^m [B]^n\\)"],
+  ["반응 속도", "반응 속도 상수(\\(\\text{k}\\))에 영향을 주는 요인", "온도와 촉매 (농도에는 영향을 받지 않음)"],
+  ["반응 속도", "활성화 에너지(\\(\\text{E}_a\\))의 정의", "화학 반응이 일어나기 위해 필요한 최소한의 에너지"],
+  ["반응 속도", "정촉매가 반응 속도를 빠르게 만드는 원리", "활성화 에너지(\\(\\text{E}_a\\))를 낮추어 활성화 상태 분자 수를 증가시킴"],
+  ["반응 속도", "온도 상승 시 반응 속도가 빨라지는 주된 원인", "활성화 에너지 이상을 가진 분자의 비율이 지수적으로 증가하기 때문"],
+
+  // 화학 평형 & 르샤틀리에
+  ["화학 평형", "동적 평형의 정의", "정반응 속도와 역반응 속도가 같아 겉보기에 반응이 정지된 것처럼 보이는 상태"],
+  ["화학 평형", "일반 반응(\\(\\text{aA} + \\text{bB} \\rightleftharpoons \\text{cC} + \\text{dD}\\))의 평형 상수(\\(\\text{K}\\)) 식", "\\(K = \\frac{[C]^c [D]^d}{[A]^a [B]^b}\\)"],
+  ["화학 평형", "평형 상수(\\(\\text{K}\\))를 변화시킬 수 있는 유일한 외부 요인", "온도 (농도, 압력, 부피, 촉매는 \\(K\\)를 변화시키지 못함)"],
+  ["화학 평형", "반응 지수(\\(\\text{Q}\\))와 평형 상수(\\(\\text{K}\\)) 비교: \\(Q < K\\)일 때 진행 방향", "정반응 진행 (생성물 증가 방향)"],
+  ["화학 평형", "반응 지수(\\(\\text{Q}\\))와 평형 상수(\\(\\text{K}\\)) 비교: \\(Q > K\\)일 때 진행 방향", "역반응 진행 (반응물 증가 방향)"],
+  ["르샤틀리에 원리", "발열 반응(\\(\\Delta H < 0\\))에서 온도를 높였을 때 평형 이동 방향", "흡열 반응인 역반응 방향으로 이동 (\\(K\\) 감소)"],
+  ["르샤틀리에 원리", "기체 반응에서 전체 압력을 높였을 때(부피 감소) 평형 이동 방향", "기체 몰수가 감소하는 방향으로 이동"],
+  ["르샤틀리에 원리", "촉매를 첨가했을 때 화학 평형의 위치 변화", "평형 이동 없음 (평형 도달 시간만 단축)"],
+
+  // 산-염기 평형 & 중화
+  ["산-염기 평형", "물의 자동 이온화 상수(\\(\\text{K}_w\\), 25 ℃) 값", "\\(K_w = [H_3O^+][OH^-] = 1.0 \\times 10^{-14}\\)"],
+  ["산-염기 평형", "수소 이온 농도 지수(\\(\\text{pH}\\)) 정의 공식", "\\(pH = -\\log[H_3O^+]\\)"],
+  ["산-염기 평형", "25 ℃ 수용액에서 \\(pH\\)와 \\(pOH\\)의 합", "\\(pH + pOH = 14\\)"],
+  ["산-염기 평형", "약산 \\(HA\\)의 산 이온화 상수(\\(\\text{K}_a\\)) 표현식", "\\(K_a = \\frac{[H_3O^+][A^-]}{[HA]}\\)"],
+  ["산-염기 평형", "중화 적정 양적 관계 공식 (가수 \\(n, n'\\), 몰농도 \\(M, M'\\), 부피 \\(V, V'\\))", "\\(nMV = n'M'V'\\)"],
+
+  // 산화 환원 & 전지
+  ["산화 환원", "전자 이동에 따른 산화와 환원의 정의", "산화: 전자를 잃음, 환원: 전자를 얻음"],
+  ["산화 환원", "호원소 물질의 산화수 규칙", "홑원소 물질을 이루는 원자의 산화수는 0"],
+  ["산화 환원", "화합물에서 수소(\\(H\\))와 산소(\\(O\\))의 일반 산화수", "수소: +1, 산소: -2"],
+  ["화학 전지", "갈바니 전지(자발적 전지)에서 음극(-)과 양극(+)의 반응", "음극(-): 산화 반응 (Anode), 양극(+): 환원 반응 (Cathode)"],
+  ["화학 전지", "표준 전지 전위(\\(\\text{E}^\\circ_{\\text{전지}}\\)) 산출 공식", "\\(E^\\circ_{\\text{전지}} = E^\\circ_{\\text{환원(양극)}} - E^\\circ_{\\text{환원(음극)}}\\)"],
+  ["전기 분해", "패러데이 전기분해 법칙 (전하량 \\(Q\\), 전류 \\(I\\), 시간 \\(t\\), 패러데이상수 \\(F\\))", "\\(Q = It = nF\\) (1 \\(F \\approx 96500\\text{ C/mol}\\))"]
+];
+
+const physicsFinalSymbols = {
+  "W":"일(Work)","E_k":"운동 에너지","E_p":"퍼텐셜 에너지","P":"일률(Power)","I":"충격량(Impulse)",
+  "p":"운동량","e":"반발 계수 / 열효율","γ":"로런츠 인자","c":"광속","E_0":"정지 에너지",
+  "Δm":"질량 결손","Q":"열량","U":"내부 에너지","W":"기체가 한 일","T_1":"고온 열원",
+  "T_2":"저온 열원","V":"유도기전력(전압)","Φ":"자기선속(자속)","B":"자기장","A":"면적",
+  "N":"코일 감은 수","P_손실":"손실 전력","R":"저항"
+};
+
+const chemistryFinalSymbols = {
+  "ΔH":"반응 엔탈피 변화","ΔH_f°":"표준 생성 엔탈피","v":"반응 속도","k":"반응 속도 상수",
+  "E_a":"활성화 에너지","K":"화학 평형 상수","Q":"반응 지수","K_w":"물의 이온화 상수",
+  "pH":"수소 이온 지수","pOH":"수산화 이온 지수","K_a":"산 이온화 상수","n, n'":"산·염기 가수",
+  "M, M'":"몰농도(M)","E°_전지":"표준 전지 전위","F":"패러데이 상수(96500 C)","n":"반응 전자 몰수"
+};
+
 const subjects = {
-  "역학과 에너지": { data: physicsData, symbols: physicsSymbols },
-  "물질과 에너지": { data: chemistryData, symbols: chemistrySymbols }
+  "역학과에너지(2학기 중간)": { data: physicsData, symbols: physicsSymbols, icon: "⚡" },
+  "역학과에너지(2학기 기말)": { data: physicsFinalData, symbols: physicsFinalSymbols, icon: "🎯" },
+  "물질과에너지(2학기 중간)": { data: chemistryData, symbols: chemistrySymbols, icon: "🧪" },
+  "물질과에너지(2학기 기말)": { data: chemistryFinalData, symbols: chemistryFinalSymbols, icon: "🔥" }
 };
 
-let currentSubject = "물리";
-let deck = [], idx = 0, flipped = false, correct = 0, answered = 0;
+/* =========================================================================
+   2. 회원가입, 로그인 및 EXP / 레벨 시스템
+   ========================================================================= */
+const TIERS = [
+  { level: 1, name: "초보 탐구자", maxExp: 50 },
+  { level: 2, name: "갈릴레오의 제자", maxExp: 100 },
+  { level: 3, name: "뉴턴의 사과러", maxExp: 200 },
+  { level: 4, name: "패러데이의 실험가", maxExp: 350 },
+  { level: 5, name: "맥스웰의 파동관측자", maxExp: 550 },
+  { level: 6, name: "아인슈타인의 시공연구원", maxExp: 800 },
+  { level: 7, name: "보어의 양자마스터", maxExp: 1100 },
+  { level: 8, name: "궁극의 과학 석학", maxExp: 999999 }
+];
 
-const selectEl = document.getElementById("subjectSelect");
-const tabsEl = document.getElementById("tabs");
+let currentUser = null;
 
-Object.keys(subjects).forEach(sub => {
-  let opt = document.createElement("option");
-  opt.value = sub;
-  opt.textContent = sub;
-  selectEl.appendChild(opt);
-});
+// 로컬 스토리지 키
+const STORAGE_USERS = "schema09_users";
+const STORAGE_SESSION = "schema09_session";
 
-selectEl.onchange = (e) => {
-  currentSubject = e.target.value;
-  buildTabs();
-  reset();
-};
-
-function buildTabs(){
-  tabsEl.innerHTML = "";
-  Object.keys(subjects).forEach(sub => {
-    let btn = document.createElement("button");
-    btn.textContent = sub;
-    btn.className = sub === currentSubject ? "on" : "";
-    btn.onclick = () => {
-      currentSubject = sub;
-      selectEl.value = sub;
-      buildTabs();
-      reset();
-    };
-    tabsEl.appendChild(btn);
-  });
+function getUsers() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_USERS)) || {};
+  } catch(e) {
+    return {};
+  }
 }
 
-function reset(){
+function saveUsers(users) {
+  localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+}
+
+function initAuth() {
+  const sessionUserId = localStorage.getItem(STORAGE_SESSION);
+  const users = getUsers();
+  if (sessionUserId && users[sessionUserId]) {
+    currentUser = users[sessionUserId];
+  } else {
+    // 게스트 기본 모드
+    currentUser = {
+      id: "guest",
+      name: "게스트 학습자",
+      exp: 0,
+      isGuest: true
+    };
+  }
+  updateUserUI();
+}
+
+function updateUserUI() {
+  const authBtnGroup = document.getElementById("authBtnGroup");
+  const displayUsername = document.getElementById("displayUsername");
+  const displayTier = document.getElementById("displayTier");
+  const currentExpEl = document.getElementById("currentExp");
+  const maxExpEl = document.getElementById("maxExp");
+  const expFill = document.getElementById("expFill");
+
+  if (currentUser.isGuest) {
+    authBtnGroup.innerHTML = `
+      <button class="btn-auth" onclick="openAuthModal('login')">로그인</button>
+      <button class="btn-auth primary" onclick="openAuthModal('register')">회원가입 (+50 EXP)</button>
+    `;
+    displayUsername.textContent = "게스트 (미로그인)";
+  } else {
+    authBtnGroup.innerHTML = `
+      <button class="btn-auth" onclick="handleLogout()">로그아웃 (${currentUser.name})</button>
+    `;
+    displayUsername.textContent = currentUser.name;
+  }
+
+  // 레벨 계산
+  const { currentTier, currentLevelExp, levelMaxExp, percent } = getTierInfo(currentUser.exp);
+  displayTier.textContent = `Lv.${currentTier.level} ${currentTier.name}`;
+  currentExpEl.textContent = currentLevelExp;
+  maxExpEl.textContent = levelMaxExp;
+  expFill.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+}
+
+function getTierInfo(totalExp) {
+  let prevMax = 0;
+  for (let i = 0; i < TIERS.length; i++) {
+    const tier = TIERS[i];
+    if (totalExp < tier.maxExp || i === TIERS.length - 1) {
+      const currentLevelExp = totalExp - prevMax;
+      const levelRequired = tier.maxExp - prevMax;
+      const percent = Math.floor((currentLevelExp / levelRequired) * 100);
+      return {
+        currentTier: tier,
+        currentLevelExp,
+        levelMaxExp: levelRequired,
+        percent: percent > 100 ? 100 : percent
+      };
+    }
+    prevMax = tier.maxExp;
+  }
+}
+
+function addExp(amount, clientX, clientY) {
+  currentUser.exp += amount;
+  
+  if (!currentUser.isGuest) {
+    const users = getUsers();
+    users[currentUser.id].exp = currentUser.exp;
+    saveUsers(users);
+  }
+
+  updateUserUI();
+  showFloatingExp(`+${amount} EXP`, clientX, clientY);
+}
+
+function showFloatingExp(text, x, y) {
+  const el = document.createElement("div");
+  el.className = "floating-exp";
+  el.textContent = text;
+  
+  const posX = x ? x : (window.innerWidth / 2) - 30;
+  const posY = y ? y : (window.innerHeight / 2);
+  
+  el.style.left = `${posX}px`;
+  el.style.top = `${posY}px`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.innerHTML = msg;
+  toast.classList.add("show");
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2400);
+}
+
+/* 모달 관련 함수 */
+function openAuthModal(mode) {
+  toggleModalMode(mode);
+  document.getElementById("authModal").classList.add("open");
+}
+
+function closeAuthModal() {
+  document.getElementById("authModal").classList.remove("open");
+}
+
+function toggleModalMode(mode) {
+  document.getElementById("loginView").style.display = mode === 'login' ? 'block' : 'none';
+  document.getElementById("registerView").style.display = mode === 'register' ? 'block' : 'none';
+}
+
+function handleRegisterSubmit(e) {
+  e.preventDefault();
+  const id = document.getElementById("regId").value.trim();
+  const name = document.getElementById("regName").value.trim();
+  const pw = document.getElementById("regPw").value.trim();
+
+  if (!id || !name || !pw) return;
+
+  const users = getUsers();
+  if (users[id]) {
+    alert("이미 존재하는 아이디입니다. 다른 아이디를 사용해주세요.");
+    return;
+  }
+
+  // 신규 계정 생성 및 보너스 50 EXP 지급
+  const newUser = {
+    id,
+    name,
+    pw,
+    exp: 50,
+    isGuest: false,
+    createdAt: new Date().toISOString()
+  };
+
+  users[id] = newUser;
+  saveUsers(users);
+
+  // 로그인 세션 설정
+  localStorage.setItem(STORAGE_SESSION, id);
+  currentUser = newUser;
+  
+  updateUserUI();
+  closeAuthModal();
+  showToast(`🎉 가입 축하! <b>${name}</b>님 환영합니다 (+50 EXP 지급)`);
+}
+
+function handleLoginSubmit(e) {
+  e.preventDefault();
+  const id = document.getElementById("loginId").value.trim();
+  const pw = document.getElementById("loginPw").value.trim();
+
+  const users = getUsers();
+  const user = users[id];
+
+  if (!user || user.pw !== pw) {
+    alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+    return;
+  }
+
+  localStorage.setItem(STORAGE_SESSION, id);
+  currentUser = { ...user, isGuest: false };
+  updateUserUI();
+  closeAuthModal();
+  showToast(`👋 <b>${currentUser.name}</b>님, 학습을 시작합니다!`);
+}
+
+function handleLogout() {
+  if (confirm("정말 로그아웃 하시겠습니까?")) {
+    localStorage.removeItem(STORAGE_SESSION);
+    initAuth();
+    showToast("로그아웃 되었습니다.");
+  }
+}
+
+/* =========================================================================
+   3. 카드 학습 로직 (카테고리 전환 & 플래시카드 & 점수)
+   ========================================================================= */
+let currentSubject = "역학과에너지(2학기 중간)";
+let deck = [];
+let idx = 0;
+let flipped = false;
+let correctCount = 0;
+let answeredCount = 0;
+let streak = 0;
+
+function switchCategory(sub) {
+  if (!subjects[sub]) return;
+  currentSubject = sub;
+  
+  // 모든 탭 버튼 액티브 상태 업데이트
+  document.querySelectorAll(".cat-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.sub === sub);
+  });
+
+  resetDeck();
+}
+
+function resetDeck() {
   deck = JSON.parse(JSON.stringify(subjects[currentSubject].data));
   shuffle(deck);
   idx = 0;
   flipped = false;
-  correct = 0;
-  answered = 0;
+  correctCount = 0;
+  answeredCount = 0;
+  streak = 0;
   
+  // 기호 목록 업데이트
   const syms = subjects[currentSubject].symbols;
-  document.getElementById("symbols").innerHTML = Object.entries(syms)
-    .map(([k,v]) => `<div><b>${k}</b> : ${v}</div>`).join("");
-    
+  document.getElementById("symbolPanelTitle").textContent = `${currentSubject} 주요 기호 정리`;
+  document.getElementById("symbolList").innerHTML = Object.entries(syms)
+    .map(([k,v]) => `
+      <div class="symbol-item">
+        <span class="symbol-key">${k}</span>
+        <span class="symbol-val">${v}</span>
+      </div>
+    `).join("");
+
   render();
 }
 
-function shuffle(a){
-  for(let i = a.length - 1; i > 0; i--){
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
 
-function render(){
-  if(!deck.length) return;
-  let [unit, topic, answer] = deck[idx];
-  document.getElementById("badge").textContent = currentSubject + " · " + (idx + 1) + "/" + deck.length;
+function render() {
+  if (!deck.length) return;
+  const [unit, topic, answer] = deck[idx];
   
-  let question = `<span class="unit-tag">[${unit}]</span>${topic}`;
+  document.getElementById("cardBadge").textContent = `${subjects[currentSubject].icon} ${currentSubject} · ${idx + 1}/${deck.length}`;
+  document.getElementById("cardSideHint").textContent = flipped ? "A. 정답" : "Q. 질문";
   
-  const contentEl = document.getElementById("content");
-  contentEl.innerHTML = flipped ? `<div class="a">${answer}</div>` : `<div class="q">${question}</div>`;
-  document.getElementById("score").textContent = `정답 ${correct} / ${answered}`;
-  
+  const contentEl = document.getElementById("cardContent");
+  if (flipped) {
+    contentEl.innerHTML = `
+      <span class="unit-tag">[${unit}]</span>
+      <div class="a-text">${answer}</div>
+    `;
+  } else {
+    contentEl.innerHTML = `
+      <span class="unit-tag">[${unit}]</span>
+      <div class="q-text">${topic}</div>
+    `;
+  }
+
+  document.getElementById("scoreStat").textContent = `${correctCount} / ${answeredCount}`;
+  document.getElementById("streakStat").textContent = `🔥 ${streak}연속 정답`;
+
+  // MathJax 비동기 수식 렌더링
   if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([contentEl]).catch((err) => console.log(err));
+    window.MathJax.typesetPromise([contentEl]).catch(err => console.error(err));
   }
 }
 
-function flip(){
+function flipCard(event) {
   flipped = !flipped;
   render();
 }
 
-function next(){
-  idx = (idx + 1) % deck.length;
-  flipped = false;
-  render();
+function handleAnswer(isKnown, event) {
+  const clickX = event ? event.clientX : null;
+  const clickY = event ? event.clientY : null;
+
+  answeredCount++;
+  if (isKnown) {
+    correctCount++;
+    streak++;
+    // 아는 공식 맞힐 시 EXP 지급 (+10 EXP)
+    addExp(10, clickX, clickY);
+
+    if (streak % 5 === 0) {
+      showToast(`🔥 <b>${streak}연속 정답 돌파!</b> 집중력 최고예요!`);
+    }
+
+    // 다음 카드로 전진
+    idx = (idx + 1) % deck.length;
+    flipped = false;
+    render();
+  } else {
+    streak = 0;
+    // 몰랐던 카드는 덱 맨 뒤로 이동
+    const currentCard = deck[idx];
+    deck.splice(idx, 1);
+    deck.push(currentCard);
+    if (idx >= deck.length) idx = 0;
+    flipped = false;
+    render();
+    showToast("💡 카드를 맨 뒤로 보관했습니다. 나중에 다시 맞춰보세요!");
+  }
 }
 
-function known(){
-  answered++;
-  correct++;
-  next();
-}
+// 키보드 단축키 지원 (스페이스바: 뒤집기, 1/방향키오른쪽: 알음, 2/방향키왼쪽: 모름)
+document.addEventListener("keydown", (e) => {
+  if (document.getElementById("authModal").classList.contains("open")) return;
+  if (e.code === "Space") {
+    e.preventDefault();
+    flipCard();
+  } else if (e.code === "Digit1" || e.code === "ArrowRight") {
+    handleAnswer(true);
+  } else if (e.code === "Digit2" || e.code === "ArrowLeft") {
+    handleAnswer(false);
+  }
+});
 
-function hold(){
-  answered++;
-  let current = deck[idx];
-  deck.splice(idx, 1);
-  deck.push(current);
-  if(idx >= deck.length) idx = 0;
-  flipped = false;
-  render();
-}
-
-// 초기화
-buildTabs();
-reset();
+// 초기화 실행
+initAuth();
+switchCategory("역학과에너지(2학기 중간)");
 </script>
 </body>
 </html>
