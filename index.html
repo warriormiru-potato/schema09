@@ -31,6 +31,11 @@ window.MathJax = {
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
+<!-- Firebase SDK (v10 compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
 <style>
 :root {
   --primary: #4f46e5;
@@ -202,6 +207,65 @@ header {
   background: linear-gradient(90deg, #6366f1, #38bdf8);
   border-radius: 999px;
   transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.user-status-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.checkin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.checkin-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.checkin-btn.done {
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: default;
+  box-shadow: none;
+}
+
+.checkin-btn.done:hover {
+  transform: none;
+}
+
+.quiz-teaser-badge {
+  font-size: 12px;
+  color: #6366f1;
+  background: var(--primary-light);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.quiz-teaser-badge:hover {
+  background: #e0e7ff;
 }
 
 /* Panels */
@@ -633,6 +697,26 @@ header {
   transform: translateX(-50%) translateY(0);
 }
 
+.mode-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+  background: #f1f5f9;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.mode-badge.firebase {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
 /* Responsive */
 @media (max-width: 560px) {
   body { padding: 16px 12px 40px; }
@@ -650,7 +734,7 @@ header {
   <header>
     <div class="title-area">
       <h1>공식암기도우미 by 서정원</h1>
-      <div class="sub">수능 및 내신 대비 과학 공식 트레이닝</div>
+      <div class="sub">수능 및 내신 대비 과학 공식 트레이닝 <span id="dbModeBadge" class="mode-badge">💾 로컬 모드</span></div>
     </div>
     <div class="auth-btn-group" id="authBtnGroup">
       <!-- 동적으로 로그인/회원가입 or 로그아웃 렌더링 -->
@@ -670,6 +754,14 @@ header {
     </div>
     <div class="progress-track">
       <div class="progress-fill" id="expFill"></div>
+    </div>
+    <div class="user-status-footer">
+      <button class="checkin-btn" id="checkinBtn" onclick="handleCheckIn(event)">
+        <span>📅</span> 오늘 출석체크 (+30 EXP)
+      </button>
+      <div class="quiz-teaser-badge" onclick="showQuizTeaser()">
+        <span>📝</span> 실전 퀴즈 (Coming Soon - EXP 획득)
+      </div>
     </div>
   </div>
 
@@ -723,7 +815,7 @@ header {
 
     <div class="action-grid">
       <button class="act-btn known" onclick="handleAnswer(true, event)">
-        <span>✨</span> 아는 공식이다! (+10 EXP)
+        <span>✨</span> 아는 공식이다!
       </button>
       <button class="act-btn unknown" onclick="handleAnswer(false, event)">
         <span>🔄</span> 몰랐다 (뒤로 보내기)
@@ -775,7 +867,7 @@ header {
     <!-- Register Form View -->
     <div id="registerView" style="display: none;">
       <h2 class="modal-title">회원가입</h2>
-      <p class="modal-desc">가입 즉시 <b>+50 EXP</b> 보너스를 드립니다!</p>
+      <p class="modal-desc">매일 출석체크와 곧 열릴 퀴즈로 EXP를 획득해보세요!</p>
       <form onsubmit="handleRegisterSubmit(event)">
         <div class="form-group">
           <label class="form-label">아이디</label>
@@ -789,7 +881,7 @@ header {
           <label class="form-label">비밀번호</label>
           <input type="password" class="form-input" id="regPw" placeholder="비밀번호" required minlength="4">
         </div>
-        <button type="submit" class="form-submit-btn">가입 완료하고 +50 EXP 받기</button>
+        <button type="submit" class="form-submit-btn">가입 완료하기</button>
       </form>
       <div class="modal-switch">
         이미 계정이 있으신가요? <a onclick="toggleModalMode('login')">로그인하기</a>
@@ -993,34 +1085,6 @@ const chemistrySymbols = {
 };
 
 const physicsFinalData = [
-  // 일과 에너지
-  ["일과 에너지", "일(Work)의 기본 정의 공식 (힘 \\(F\\), 이동거리 \\(s\\), 각도 \\(\\theta\\))", "\\(W = Fs \\cos\\theta\\)"],
-  ["일과 에너지", "운동 에너지 공식 (질량 \\(m\\), 속력 \\(v\\))", "\\(E_k = \\frac{1}{2}mv^2\\)"],
-  ["일과 에너지", "중력 퍼텐셜(위치) 에너지 공식 (기준면으로부터 높이 \\(h\\))", "\\(E_p = mgh\\)"],
-  ["일과 에너지", "용수철 탄성력에 의한 퍼텐셜 에너지 (용수철 상수 \\(k\\), 변위 \\(x\\))", "\\(E_p = \\frac{1}{2}kx^2\\)"],
-  ["일과 에너지", "일-에너지 정리 (알짜힘이 한 일과 운동 에너지 변화)", "\\(W_{\\text{net}} = \\Delta E_k = \\frac{1}{2}mv^2 - \\frac{1}{2}mv_0^2\\)"],
-  ["일과 에너지", "역학적 에너지 보존 법칙 (보존력만 작용할 때)", "\\(E = E_k + E_p = \\text{일정}\\)"],
-  ["일과 에너지", "마찰력 등 비보존력이 한 일과 역학적 에너지의 관계", "\\(W_{\\text{비보존력}} = \\Delta E = E_{\\text{나중}} - E_{\\text{처음}}\\)"],
-  ["일과 에너지", "일률(Power) 공식 (일 \\(W\\), 시간 \\(t\\), 힘 \\(F\\), 속력 \\(v\\))", "\\(P = \\frac{W}{t} = Fv\\)"],
-
-  // 충격량과 운동량 보존
-  ["충격량", "충격량(Impulse)의 정의 공식 (힘 \\(F\\), 작용 시간 \\(\\Delta t\\))", "\\(I = F \\Delta t\\)"],
-  ["충격량", "충격량과 운동량 변화량의 관계식", "\\(I = \\Delta p = mv - mv_0\\)"],
-  ["충격량", "충돌 시 물체가 받는 평균 충격력(힘) 공식", "\\(F = \\frac{\\Delta p}{\\Delta t} = \\frac{m\\Delta v}{\\Delta t}\\)"],
-  ["충격량", "운동량 보존 법칙 (두 물체 1차원 충돌)", "\\(m_1v_1 + m_2v_2 = m_1v_1' + m_2v_2'\\)"],
-  ["충격량", "반발 계수(\\(\\text{e}\\)) 정의 공식", "\\(e = -\\frac{v_1' - v_2'}{v_1 - v_2} = \\frac{|v_1' - v_2'|}{|v_1 - v_2|}\\)"],
-  ["충격량", "완전 탄성 충돌의 반발 계수 값과 역학적 에너지 보존 여부", "\\(e = 1\\), 운동 에너지와 역학적 에너지 보존"],
-  ["충격량", "완전 비탄성 충돌(충돌 후 합체) 시 반발 계수 및 나중 속도", "\\(e = 0\\), \\(v' = \\frac{m_1v_1 + m_2v_2}{m_1 + m_2}\\)"],
-
-  // 특수 상대성 이론
-  ["특수 상대성", "특수 상대성 이론의 2가지 기본 가정", "1. 상대성 원리, 2. 광속 불변 원리"],
-  ["특수 상대성", "로런츠 인자(\\(\\gamma\\)) 공식", "\\(\\gamma = \\frac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}\\)"],
-  ["특수 상대성", "시간 지연(시간 팽창) 공식 (고유 시간 \\(\\Delta t_0\\))", "\\(\\Delta t = \\gamma \\Delta t_0 = \\frac{\\Delta t_0}{\\sqrt{1 - \\frac{v^2}{c^2}}}\\)"],
-  ["특수 상대성", "길이 수축 공식 (고유 길이 \\(L_0\\))", "\\(L = \\frac{L_0}{\\gamma} = L_0 \\sqrt{1 - \\frac{v^2}{c^2}}\\)"],
-  ["특수 상대성", "질량-에너지 동등성 기본 공식", "\\(E = mc^2\\)"],
-  ["특수 상대성", "정지 질량 \\(m_0\\)인 물체의 정지 에너지", "\\(E_0 = m_0 c^2\\)"],
-  ["특수 상대성", "핵반응(핵분열·핵융합) 시 방출되는 결손 질량 에너지 공식", "\\(\\Delta E = \\Delta m \\cdot c^2\\)"],
-
   // 열역학 법칙 & 열효율
   ["열역학 법칙", "기체가 팽창할 때 외부로 한 일 공식 (압력 \\(P\\), 부피변화 \\(\\Delta V\\))", "\\(W = P\\Delta V\\)"],
   ["열역학 법칙", "열역학 제1법칙 (기체에 공급한 열량 \\(Q\\), 내부에너지변화 \\(\\Delta U\\), 일 \\(W\\))", "\\(Q = \\Delta U + W\\)"],
@@ -1114,12 +1178,45 @@ const TIERS = [
   { level: 5, name: "맥스웰의 파동관측자", maxExp: 550 },
   { level: 6, name: "아인슈타인의 시공연구원", maxExp: 800 },
   { level: 7, name: "보어의 양자마스터", maxExp: 1100 },
-  { level: 8, name: "궁극의 과학 석학", maxExp: 999999 }
+  { level: 8, name: "이수현 뇌 약탈자", maxExp: 999999 }
 ];
 
 let currentUser = null;
 
-// 로컬 스토리지 키
+// =========================================================================
+// 🔥 Firebase 설정 (Firebase 콘솔에서 발급받은 실제 설정값으로 교체하세요)
+// apiKey가 "YOUR_API_KEY"인 동안에는 브라우저 로컬 저장소(localStorage)로 자동 안전 작동합니다.
+// =========================================================================
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const isFirebaseConfigured = Boolean(
+  window.firebase &&
+  firebaseConfig.apiKey &&
+  firebaseConfig.apiKey !== "YOUR_API_KEY"
+);
+
+let fbAuth = null;
+let fbDb = null;
+
+if (isFirebaseConfigured) {
+  try {
+    firebase.initializeApp(firebaseConfig);
+    fbAuth = firebase.auth();
+    fbDb = firebase.firestore();
+    console.log("🔥 Firebase 클라우드 모드가 정상 활성화되었습니다.");
+  } catch (err) {
+    console.error("Firebase 초기화 에러:", err);
+  }
+}
+
+// 로컬 스토리지 Fallback 키
 const STORAGE_USERS = "schema09_users";
 const STORAGE_SESSION = "schema09_session";
 
@@ -1135,21 +1232,88 @@ function saveUsers(users) {
   localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
 }
 
+// 아이디를 이메일 형식으로 변환 (Firebase Auth 호환)
+function toEmail(id) {
+  return id.includes("@") ? id : `${id}@schema09.app`;
+}
+
 function initAuth() {
-  const sessionUserId = localStorage.getItem(STORAGE_SESSION);
-  const users = getUsers();
-  if (sessionUserId && users[sessionUserId]) {
-    currentUser = users[sessionUserId];
-  } else {
-    // 게스트 기본 모드
-    currentUser = {
-      id: "guest",
-      name: "게스트 학습자",
-      exp: 0,
-      isGuest: true
-    };
+  const badgeEl = document.getElementById("dbModeBadge");
+  if (badgeEl) {
+    if (isFirebaseConfigured) {
+      badgeEl.textContent = "☁️ Firebase 연동됨";
+      badgeEl.className = "mode-badge firebase";
+    } else {
+      badgeEl.textContent = "💾 로컬 모드";
+      badgeEl.className = "mode-badge";
+    }
   }
-  updateUserUI();
+
+  if (isFirebaseConfigured && fbAuth) {
+    // Firebase 인증 상태 리스너
+    fbAuth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const docSnap = await fbDb.collection("users").doc(user.uid).get();
+          if (docSnap.exists) {
+            currentUser = { uid: user.uid, ...docSnap.data(), isGuest: false };
+          } else {
+            const defaultUser = {
+              id: user.email.split("@")[0],
+              name: user.displayName || user.email.split("@")[0],
+              exp: 0,
+              lastCheckInDate: null,
+              attendanceStreak: 0
+            };
+            await fbDb.collection("users").doc(user.uid).set(defaultUser);
+            currentUser = { uid: user.uid, ...defaultUser, isGuest: false };
+          }
+        } catch(err) {
+          console.error("Firestore 유저 불러오기 실패:", err);
+        }
+      } else {
+        currentUser = {
+          id: "guest",
+          name: "게스트 학습자",
+          exp: 0,
+          isGuest: true
+        };
+      }
+      updateUserUI();
+    });
+  } else {
+    // 로컬스토리지 모드
+    const sessionUserId = localStorage.getItem(STORAGE_SESSION);
+    const users = getUsers();
+    if (sessionUserId && users[sessionUserId]) {
+      currentUser = users[sessionUserId];
+    } else {
+      currentUser = {
+        id: "guest",
+        name: "게스트 학습자",
+        exp: 0,
+        isGuest: true
+      };
+    }
+    updateUserUI();
+  }
+}
+
+function getTodayString() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getYesterdayString() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function updateUserUI() {
@@ -1159,18 +1323,35 @@ function updateUserUI() {
   const currentExpEl = document.getElementById("currentExp");
   const maxExpEl = document.getElementById("maxExp");
   const expFill = document.getElementById("expFill");
+  const checkinBtn = document.getElementById("checkinBtn");
+
+  const today = getTodayString();
+  const isCheckedToday = !currentUser.isGuest && currentUser.lastCheckInDate === today;
 
   if (currentUser.isGuest) {
     authBtnGroup.innerHTML = `
       <button class="btn-auth" onclick="openAuthModal('login')">로그인</button>
-      <button class="btn-auth primary" onclick="openAuthModal('register')">회원가입 (+50 EXP)</button>
+      <button class="btn-auth primary" onclick="openAuthModal('register')">회원가입</button>
     `;
     displayUsername.textContent = "게스트 (미로그인)";
+    if (checkinBtn) {
+      checkinBtn.innerHTML = `<span>📅</span> 출석체크 (로그인 필요)`;
+      checkinBtn.className = "checkin-btn";
+    }
   } else {
     authBtnGroup.innerHTML = `
       <button class="btn-auth" onclick="handleLogout()">로그아웃 (${currentUser.name})</button>
     `;
     displayUsername.textContent = currentUser.name;
+    if (checkinBtn) {
+      if (isCheckedToday) {
+        checkinBtn.innerHTML = `<span>✅</span> 오늘 출석 완료 (${currentUser.attendanceStreak || 1}일 연속)`;
+        checkinBtn.className = "checkin-btn done";
+      } else {
+        checkinBtn.innerHTML = `<span>📅</span> 오늘 출석체크 (+30 EXP)`;
+        checkinBtn.className = "checkin-btn";
+      }
+    }
   }
 
   // 레벨 계산
@@ -1204,9 +1385,17 @@ function addExp(amount, clientX, clientY) {
   currentUser.exp += amount;
   
   if (!currentUser.isGuest) {
-    const users = getUsers();
-    users[currentUser.id].exp = currentUser.exp;
-    saveUsers(users);
+    if (isFirebaseConfigured && fbDb && currentUser.uid) {
+      fbDb.collection("users").doc(currentUser.uid).update({
+        exp: currentUser.exp
+      }).catch(err => console.error("Firestore EXP 동기화 실패:", err));
+    } else {
+      const users = getUsers();
+      if (users[currentUser.id]) {
+        users[currentUser.id].exp = currentUser.exp;
+        saveUsers(users);
+      }
+    }
   }
 
   updateUserUI();
@@ -1251,7 +1440,7 @@ function toggleModalMode(mode) {
   document.getElementById("registerView").style.display = mode === 'register' ? 'block' : 'none';
 }
 
-function handleRegisterSubmit(e) {
+async function handleRegisterSubmit(e) {
   e.preventDefault();
   const id = document.getElementById("regId").value.trim();
   const name = document.getElementById("regName").value.trim();
@@ -1259,58 +1448,174 @@ function handleRegisterSubmit(e) {
 
   if (!id || !name || !pw) return;
 
-  const users = getUsers();
-  if (users[id]) {
-    alert("이미 존재하는 아이디입니다. 다른 아이디를 사용해주세요.");
+  if (isFirebaseConfigured && fbAuth && fbDb) {
+    try {
+      const email = toEmail(id);
+      const userCred = await fbAuth.createUserWithEmailAndPassword(email, pw);
+      const uid = userCred.user.uid;
+
+      const newUser = {
+        id,
+        name,
+        exp: 0,
+        lastCheckInDate: null,
+        attendanceStreak: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      await fbDb.collection("users").doc(uid).set(newUser);
+      currentUser = { uid, ...newUser, isGuest: false };
+
+      updateUserUI();
+      closeAuthModal();
+      showToast(`🎉 <b>${name}</b>님, Firebase 가입 성공! 오늘 출석체크를 진행해보세요.`);
+    } catch(err) {
+      console.error("Firebase 가입 실패:", err);
+      let msg = "회원가입에 실패했습니다.";
+      if (err.code === "auth/email-already-in-use") msg = "이미 사용 중인 아이디입니다.";
+      else if (err.code === "auth/weak-password") msg = "비밀번호는 최소 6자 이상이어야 합니다.";
+      alert(msg);
+    }
+  } else {
+    // 로컬스토리지 모드
+    const users = getUsers();
+    if (users[id]) {
+      alert("이미 존재하는 아이디입니다. 다른 아이디를 사용해주세요.");
+      return;
+    }
+
+    const newUser = {
+      id,
+      name,
+      pw,
+      exp: 0,
+      isGuest: false,
+      lastCheckInDate: null,
+      attendanceStreak: 0,
+      createdAt: new Date().toISOString()
+    };
+
+    users[id] = newUser;
+    saveUsers(users);
+
+    localStorage.setItem(STORAGE_SESSION, id);
+    currentUser = newUser;
+    
+    updateUserUI();
+    closeAuthModal();
+    showToast(`🎉 <b>${name}</b>님 가입을 환영합니다! 오늘 출석체크를 진행해보세요.`);
+  }
+}
+
+async function handleCheckIn(event) {
+  if (currentUser.isGuest) {
+    showToast("출석체크로 EXP를 얻으려면 로그인이 필요합니다.");
+    openAuthModal('login');
     return;
   }
 
-  // 신규 계정 생성 및 보너스 50 EXP 지급
-  const newUser = {
-    id,
-    name,
-    pw,
-    exp: 50,
-    isGuest: false,
-    createdAt: new Date().toISOString()
-  };
+  const today = getTodayString();
+  if (currentUser.lastCheckInDate === today) {
+    showToast(`오늘 이미 출석체크를 완료했습니다! (연속 ${currentUser.attendanceStreak || 1}일째)`);
+    return;
+  }
 
-  users[id] = newUser;
-  saveUsers(users);
+  const yesterday = getYesterdayString();
+  if (currentUser.lastCheckInDate === yesterday) {
+    currentUser.attendanceStreak = (currentUser.attendanceStreak || 1) + 1;
+  } else {
+    currentUser.attendanceStreak = 1;
+  }
 
-  // 로그인 세션 설정
-  localStorage.setItem(STORAGE_SESSION, id);
-  currentUser = newUser;
-  
-  updateUserUI();
-  closeAuthModal();
-  showToast(`🎉 가입 축하! <b>${name}</b>님 환영합니다 (+50 EXP 지급)`);
+  currentUser.lastCheckInDate = today;
+
+  // 출석체크 기본 보너스 +30 EXP
+  const earnedExp = 30;
+  const clickX = event ? event.clientX : null;
+  const clickY = event ? event.clientY : null;
+
+  addExp(earnedExp, clickX, clickY);
+
+  // 사용자 정보 업데이트 저장
+  if (isFirebaseConfigured && fbDb && currentUser.uid) {
+    fbDb.collection("users").doc(currentUser.uid).update({
+      lastCheckInDate: today,
+      attendanceStreak: currentUser.attendanceStreak
+    }).catch(err => console.error("Firestore 출석체크 동기화 실패:", err));
+  } else {
+    const users = getUsers();
+    if (users[currentUser.id]) {
+      users[currentUser.id].lastCheckInDate = today;
+      users[currentUser.id].attendanceStreak = currentUser.attendanceStreak;
+      saveUsers(users);
+    }
+  }
+
+  showToast(`🎉 <b>출석체크 완료!</b> +${earnedExp} EXP 적립 (연속 ${currentUser.attendanceStreak}일 출석!)`);
 }
 
-function handleLoginSubmit(e) {
+function showQuizTeaser() {
+  showToast("📝 <b>실전 공식 퀴즈 기능</b>이 곧 오픈됩니다! 퀴즈 문제를 풀면 추가 EXP를 획득할 수 있습니다.");
+}
+
+async function handleLoginSubmit(e) {
   e.preventDefault();
   const id = document.getElementById("loginId").value.trim();
   const pw = document.getElementById("loginPw").value.trim();
 
-  const users = getUsers();
-  const user = users[id];
+  if (!id || !pw) return;
 
-  if (!user || user.pw !== pw) {
-    alert("아이디 또는 비밀번호가 올바르지 않습니다.");
-    return;
+  if (isFirebaseConfigured && fbAuth && fbDb) {
+    try {
+      const email = toEmail(id);
+      const userCred = await fbAuth.signInWithEmailAndPassword(email, pw);
+      const uid = userCred.user.uid;
+      const docSnap = await fbDb.collection("users").doc(uid).get();
+
+      if (docSnap.exists) {
+        currentUser = { uid, ...docSnap.data(), isGuest: false };
+      } else {
+        currentUser = { uid, id, name: id, exp: 0, isGuest: false };
+      }
+
+      updateUserUI();
+      closeAuthModal();
+      showToast(`👋 <b>${currentUser.name}</b>님, Firebase 로그인 성공!`);
+    } catch(err) {
+      console.error("Firebase 로그인 실패:", err);
+      alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+    }
+  } else {
+    // 로컬스토리지 모드
+    const users = getUsers();
+    const user = users[id];
+
+    if (!user || user.pw !== pw) {
+      alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+      return;
+    }
+
+    localStorage.setItem(STORAGE_SESSION, id);
+    currentUser = { ...user, isGuest: false };
+    updateUserUI();
+    closeAuthModal();
+    showToast(`👋 <b>${currentUser.name}</b>님, 학습을 시작합니다!`);
   }
-
-  localStorage.setItem(STORAGE_SESSION, id);
-  currentUser = { ...user, isGuest: false };
-  updateUserUI();
-  closeAuthModal();
-  showToast(`👋 <b>${currentUser.name}</b>님, 학습을 시작합니다!`);
 }
 
-function handleLogout() {
+async function handleLogout() {
   if (confirm("정말 로그아웃 하시겠습니까?")) {
+    if (isFirebaseConfigured && fbAuth) {
+      await fbAuth.signOut();
+    }
     localStorage.removeItem(STORAGE_SESSION);
-    initAuth();
+    currentUser = {
+      id: "guest",
+      name: "게스트 학습자",
+      exp: 0,
+      isGuest: true
+    };
+    updateUserUI();
     showToast("로그아웃 되었습니다.");
   }
 }
@@ -1411,8 +1716,6 @@ function handleAnswer(isKnown, event) {
   if (isKnown) {
     correctCount++;
     streak++;
-    // 아는 공식 맞힐 시 EXP 지급 (+10 EXP)
-    addExp(10, clickX, clickY);
 
     if (streak % 5 === 0) {
       showToast(`🔥 <b>${streak}연속 정답 돌파!</b> 집중력 최고예요!`);
