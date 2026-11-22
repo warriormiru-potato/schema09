@@ -270,7 +270,7 @@
       max-width: 100%;
       width: 100%;
       word-break: keep-all;
-      overflow-x: auto; /* 수식이 길어지면 부모 영역 안에서 스크롤되도록 처리 */
+      overflow-x: auto;
     }
 
     .q-text {
@@ -281,7 +281,6 @@
       word-break: break-all;
     }
 
-    /* [수정됨] 수식 오버플로우 방지를 위한 스타일 개선 */
     .a-text {
       font-size: 20px;
       font-weight: 800;
@@ -363,34 +362,6 @@
     .score-badge {
       font-weight: 700;
       color: var(--text-main);
-    }
-
-    /* Symbol Dictionary Section */
-    .symbol-header {
-      font-size: 15px;
-      font-weight: 700;
-      color: #334155;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .symbol-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 8px;
-    }
-
-    .symbol-item {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 7px 10px;
-      font-size: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
   </style>
 </head>
@@ -477,25 +448,9 @@
         <span id="streakStat">🔥 0연속 정답</span>
       </div>
     </div>
-
-    <!-- Status / Info Section -->
-    <div class="panel">
-      <div class="symbol-header">
-        <span>📌</span> <span id="symbolPanelTitle">연동 상태</span>
-      </div>
-      <div class="symbol-grid" id="symbolList"></div>
-    </div>
   </div>
 
   <script>
-    /* =========================================================================
-       구글 스프레드시트 공개 CSV 링크 설정 (5열 표준)
-       A열: 학기인덱스(1,2)
-       B열: 고사인덱스(1:중간, 2:기말)
-       C열: 단원명인덱스
-       D열: 제시하는 문제
-       E열: 정답
-       ========================================================================= */
     const BASE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSo-eJr4GCfJQXcmzLkkp9-3a5L4pY0JQM2EO7vqPQenvmWgLkq_M_q7LqWhtCea4353j-BkjMhXptc/pub";
 
     const SUBJECT_SHEETS = [
@@ -506,9 +461,9 @@
 
     let subjects = {};
     let currentSubject = "";
-    let currentSemester = "1"; // "1" 또는 "2"
-    let currentExam = "1";     // "1"(중간), "2"(기말)
-    let unitFilter = "";       // 단원 인덱스 혹은 빈 문자열(전범위)
+    let currentSemester = "1";
+    let currentExam = "1";
+    let unitFilter = "";
 
     let deck = [], idx = 0, flipped = false, correctCount = 0, answeredCount = 0, streak = 0;
 
@@ -541,7 +496,6 @@
             throw new Error("HTML 반환됨");
           }
           const rows = parseCSV(text);
-          // 5열 매핑: [학기(A), 고사(B), 단원인덱스(C), 문제(D), 정답(E)]
           const data = rows.slice(1).map(row => {
             const [semester, exam, unitIndex, topic, answer] = row;
             if (!topic?.trim()) return null;
@@ -655,7 +609,6 @@
         return matchSem && matchExam && matchUnit;
       });
 
-      /* [수정됨] 단원별 그룹화 후 각각 완벽하게 랜덤 셔플 적용 */
       const groups = {};
       source.forEach(item => {
         const u = item[2] || "기타";
@@ -675,10 +628,6 @@
       correctCount = 0;
       answeredCount = 0;
       streak = 0;
-
-      let examName = currentExam === "1" ? "중간고사" : "기말고사";
-      let modeText = unitFilter ? `단원(${unitFilter})` : `${currentSemester}학기 ${examName} 전범위`;
-      document.getElementById("symbolList").innerHTML = `<div class='symbol-item' style='grid-column: 1 / -1; justify-content: center;'>${modeText} 모드 활성화 (${source.length}개 공식)</div>`;
 
       render();
     }
