@@ -444,7 +444,7 @@
       <!-- 4. 단원 세부 필터 -->
       <div class="filter-bar">
         <select id="unitFilter" onchange="applyFilters()">
-          <option value="">🎯 해당 고사 전범위 테스트</option>
+          <option value=""> 해당 고사 전범위 테스트</option>
         </select>
       </div>
     </div>
@@ -499,9 +499,9 @@
     const BASE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSo-eJr4GCfJQXcmzLkkp9-3a5L4pY0JQM2EO7vqPQenvmWgLkq_M_q7LqWhtCea4353j-BkjMhXptc/pub";
 
     const SUBJECT_SHEETS = [
-      { key: "physics", name: "역학과 에너지", subName: "물리", icon: "⚡", url: `${BASE_SHEET_URL}?gid=0&single=true&output=csv` },
-      { key: "chemistry", name: "물질과 에너지", subName: "화학", icon: "🧪", url: `${BASE_SHEET_URL}?gid=1389842519&single=true&output=csv` },
-      { key: "datascience", name: "데이터과학", subName: "데이터", icon: "📊", url: `${BASE_SHEET_URL}?gid=1666028191&single=true&output=csv` }
+      { key: "physics", name: "역학과 에너지", subName: "물리", icon: "물", url: `${BASE_SHEET_URL}?gid=0&single=true&output=csv` },
+      { key: "chemistry", name: "물질과 에너지", subName: "화학", icon: "화", url: `${BASE_SHEET_URL}?gid=1389842519&single=true&output=csv` },
+      { key: "datascience", name: "데이터과학", subName: "데이터", icon: "데", url: `${BASE_SHEET_URL}?gid=1666028191&single=true&output=csv` }
     ];
 
     let subjects = {};
@@ -637,7 +637,7 @@
 
       const el = document.getElementById("unitFilter");
       let examLabel = currentExam === "1" ? "중간" : "기말";
-      el.innerHTML = `<option value="">🎯 ${currentSemester}학기 ${examLabel}고사 전범위 테스트 (${filtered.length}개)</option>` + 
+      el.innerHTML = `<option value=""> ${currentSemester}학기 ${examLabel}고사 전범위 테스트 (${filtered.length}개)</option>` + 
         units.map(v => `<option value="${v}">단원별: ${v}</option>`).join("");
     }
 
