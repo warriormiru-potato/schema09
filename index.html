@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>공식암기도우미 by 서정원 | 과학 공식 마스터</title>
+  <title>공식암기도우미 by 서정원</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -267,23 +267,31 @@
     }
 
     .card-text {
-      max-width: 90%;
+      max-width: 100%;
+      width: 100%;
       word-break: keep-all;
+      overflow-x: auto; /* 수식이 길어지면 부모 영역 안에서 스크롤되도록 처리 */
     }
 
     .q-text {
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 700;
       color: #1e293b;
       line-height: 1.55;
+      word-break: break-all;
     }
 
+    /* [수정됨] 수식 오버플로우 방지를 위한 스타일 개선 */
     .a-text {
-      font-size: 23px;
+      font-size: 20px;
       font-weight: 800;
       color: #0f172a;
       line-height: 1.6;
-      white-space: pre-line;
+      white-space: pre-wrap;
+      word-break: break-all;
+      overflow-x: auto;
+      max-width: 100%;
+      padding: 4px 0;
     }
 
     .tap-hint {
@@ -457,7 +465,7 @@
 
       <div class="action-grid">
         <button class="act-btn known" onclick="handleAnswer(true, event)">
-          <span>✨</span> 아는 공식이다!
+          <span>✨</span> 알고있다
         </button>
         <button class="act-btn unknown" onclick="handleAnswer(false, event)">
           <span>🔄</span> 몰랐다 (뒤로 보내기)
@@ -625,7 +633,7 @@
     function updateFilterOptions() {
       const allData = subjects[currentSubject]?.data || [];
       const filtered = allData.filter(d => d[0] === currentSemester && d[1] === currentExam);
-      const units = [...new Set(filtered.map(d => d[2]).filter(Boolean))].sort();
+      const units = [...new Set(filtered.map(d => d[2]).filter(Boolean))];
 
       const el = document.getElementById("unitFilter");
       let examLabel = currentExam === "1" ? "중간" : "기말";
@@ -647,8 +655,21 @@
         return matchSem && matchExam && matchUnit;
       });
 
-      deck = JSON.parse(JSON.stringify(source));
-      shuffle(deck);
+      /* [수정됨] 단원별 그룹화 후 각각 완벽하게 랜덤 셔플 적용 */
+      const groups = {};
+      source.forEach(item => {
+        const u = item[2] || "기타";
+        if (!groups[u]) groups[u] = [];
+        groups[u].push(item);
+      });
+
+      deck = [];
+      Object.keys(groups).forEach(u => {
+        const unitItems = [...groups[u]];
+        shuffle(unitItems);
+        deck.push(...unitItems);
+      });
+
       idx = 0;
       flipped = false;
       correctCount = 0;
@@ -691,12 +712,12 @@
       const contentEl = document.getElementById("cardContent");
       if (flipped) {
         contentEl.innerHTML = `
-          ${unitIndex ? `<span class="unit-tag">[단원: ${unitIndex}]</span>` : ""}
+          ${unitIndex ? `<span class="unit-type" style="display:inline-block; background:#e0e7ff; color:#4338ca; font-size:13px; font-weight:700; padding:3px 9px; border-radius:6px; margin-bottom:12px;">[단원: ${unitIndex}]</span>` : ""}
           <div class="a-text">${answer}</div>
         `;
       } else {
         contentEl.innerHTML = `
-          ${unitIndex ? `<span class="unit-tag">[단원: ${unitIndex}]</span>` : ""}
+          ${unitIndex ? `<span class="unit-type" style="display:inline-block; background:#e0e7ff; color:#4338ca; font-size:13px; font-weight:700; padding:3px 9px; border-radius:6px; margin-bottom:12px;">[단원: ${unitIndex}]</span>` : ""}
           <div class="q-text">${topic}</div>
         `;
       }
