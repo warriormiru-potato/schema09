@@ -35,11 +35,6 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
 
-  <!-- Firebase SDK (v10 compat) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
   <style>
     :root {
       --primary: #4f46e5;
@@ -489,9 +484,6 @@
     </div>
   </div>
 
-  <!-- Toast Feedback -->
-  <div class="toast" id="toast"></div>
-
   <script>
     /* =========================================================================
        1. 데이터 정의 (역학과 에너지 & 물질과 에너지)
@@ -822,16 +814,6 @@
        2. 카드 학습 로직 (카테고리 전환 & 플래시카드 & 점수)
        ========================================================================= (카테고리 전환 & 플래시카드 & 점수)
        ========================================================================= */
-
-    function showToast(msg) {
-      const toast = document.getElementById("toast");
-      if (!toast) return;
-      toast.innerHTML = msg;
-      toast.classList.add("show");
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2400);
-    }
 
     let currentSubject = "역학과에너지(2학기 중간)";
     let deck = [];
