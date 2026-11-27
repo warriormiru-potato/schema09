@@ -496,7 +496,7 @@
             throw new Error("HTML 반환됨");
           }
           const rows = parseCSV(text);
-          const data = rows.slice(1).map(row => {
+          const data = rows.map(row => {
             const [semester, exam, unitIndex, topic, answer] = row;
             if (!topic?.trim()) return null;
             return [
